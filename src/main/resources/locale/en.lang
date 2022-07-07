@@ -1,0 +1,20 @@
+[tile]
+
+[object]
+
+[item]
+SmallBag=Small Bag
+MediumBag=Medium Bag
+LargeBag=Large Bag
+ExtraLargeBag=Extra Large Bag
+DeepPouch=Deep Pouch
+
+[itemtooltip]
+bagUsage=Right click to open the bag.
+bagSize=Slot count: <size>
+storedItems=Stored items: <items>
+deepBagExplanation=This bag holds <multiplier>x more items per stack!
+
+[mob]
+
+[buff]
