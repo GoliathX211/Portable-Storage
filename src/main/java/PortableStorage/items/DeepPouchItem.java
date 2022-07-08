@@ -1,5 +1,6 @@
 package PortableStorage.items;
 
+import PortableStorage.inventory.DeepPouchInventory;
 import necesse.engine.GameLog;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDItem;
@@ -8,8 +9,7 @@ import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
-import necesse.inventory.item.Item;
-import necesse.inventory.item.miscItem.PouchItem;
+import necesse.inventory.ItemCombineResult;
 import necesse.level.maps.Level;
 
 public class DeepPouchItem extends BasicPouchItem {
@@ -36,34 +36,25 @@ public class DeepPouchItem extends BasicPouchItem {
     public Inventory getInternalInventory(InventoryItem item) {
         GNDItem gndItem = item.getGndData().getItem("inventory");
         if (gndItem instanceof GNDItemInventory) {
-            GNDItemInventory gndInventory = (GNDItemInventory)gndItem;
+            GameLog.debug.println("GNDItem is type if GNDItemInventory.");
+            GameLog.debug.println("Inventory type" + ((GNDItemInventory) gndItem).inventory.getClass());
+            GNDItemInventory gndInventory = (GNDItemInventory) gndItem;
             if (gndInventory.inventory.getSize() != this.getInternalInventorySize()) {
                 gndInventory.inventory.changeSize(this.getInternalInventorySize());
             }
-            //GameLog.debug.println("gndItem instanceof GNDItemInventory, no tagging.");
-                                                      return gndInventory.inventory;
+            return gndInventory.inventory;
 
-        }
-        else {
-            // GameLog.debug.println("gndItem not instanceof GNDItemInventory, tagged.");
-            Inventory inventory = new TaggedInventory(this.getInternalInventorySize(), this);
+        } else {
+            GameLog.debug.println("GNDItem is not type of GNDItemInventory.");
+            Inventory inventory = new DeepPouchInventory(this.getInternalInventorySize(), this);
             item.getGndData().setItem("inventory", new GNDItemInventory(inventory));
             return inventory;
         }
-
     }
-    // currently asking: "Is the item we're putting into an inventory a deep pouch?"
 
-    public class TaggedInventory extends Inventory {
-
-        public final Item item;
-
-        // If you need to differentiate between different types of tagged inventories: add a field to be used to discriminate between inventories.
-        // e.g:
-        public TaggedInventory(int size, Item item) {
-            super(size);
-            this.item = item;
-
-        }
+    @Override
+    public void saveInternalInventory(InventoryItem item, Inventory inventory) {
+        GameLog.debug.println("saveInternalInventory: " + inventory.getClass().toString());
+        super.saveInternalInventory(item, inventory);
     }
 }

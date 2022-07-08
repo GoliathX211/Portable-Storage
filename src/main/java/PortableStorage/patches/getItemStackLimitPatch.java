@@ -1,5 +1,6 @@
 package PortableStorage.patches;
 
+import PortableStorage.inventory.DeepPouchInventory;
 import PortableStorage.items.DeepPouchItem;
 import necesse.engine.GameLog;
 import necesse.engine.modLoader.annotations.ModMethodPatch;
@@ -18,10 +19,19 @@ public class getItemStackLimitPatch {
                        @Advice.Argument(1) InventoryItem inventoryItem,
                        @Advice.Return(readOnly=false) int returnedStackSize) {
         GameLog.debug.printf("inventory: %s \n", inventory.toString());
-        if (inventory instanceof DeepPouchItem.TaggedInventory) {
+        if (inventory instanceof DeepPouchInventory) {
+
+            // region Stack Trace
+            //System.out.println("Printing stack trace.");
+            //StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+            //for (StackTraceElement element : elements) {
+            //    System.out.printf("\tAt %s.%s (%s:%d)\n", element.getClassName(), element.getMethodName(), element.getFileName(), element.getLineNumber());
+            //}
+            // endregion
+
             GameLog.debug.printf("returnedStackSize: %d, slot %d, inventory: %s inventoryItem: %s \n", returnedStackSize, slot, inventory.toString(), inventoryItem.toString());
             GameLog.debug.println("inventory is instance of taggedInventory");
-            DeepPouchItem dp = (DeepPouchItem) ((DeepPouchItem.TaggedInventory) inventory).item;
+            DeepPouchItem dp = ((DeepPouchInventory) inventory).deepPouchItem;
             long futureStackSize = ((long) returnedStackSize) * dp.multiplicity;
             InventoryFilter filter = inventory.filter;
             int filterMaxSize = filter == null ? inventoryItem.itemStackSize() : filter.getItemStackLimit(slot, inventoryItem);
