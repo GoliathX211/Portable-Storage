@@ -11,7 +11,7 @@ def modInfo = [
         modVersion     : "1.01",
         gameVersion    : "0.21.23",
         modDescription : "Implements unique storage bags so you can store all your items.",
-        author         : "GoliathX211",
+        author         : "GoliathX211...Deadly990",
         clientside     : false,
         modDependencies         : [],
         modOptionalDependencies : [],
