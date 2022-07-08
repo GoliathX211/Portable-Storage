@@ -32,5 +32,12 @@ public class ModItemsRegistry {
                 500.0f,
                 true
         );
+        ItemRegistry.registerItem(
+                "DeepBag",
+                new DeepPouchItem(10, 50, Item.Rarity.UNIQUE),
+                250.0f,
+                true
+
+        );
     }
 }
