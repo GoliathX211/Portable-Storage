@@ -2,6 +2,7 @@ package PortableStorage.registry;
 
 import PortableStorage.items.BasicPouchItem;
 import PortableStorage.items.DeepPouchItem;
+import PortableStorage.items.TackleboxItem;
 import necesse.engine.registries.ItemRegistry;
 import necesse.inventory.item.Item;
 
@@ -30,6 +31,12 @@ public class ModItemsRegistry {
                 "ExtraLargeBag",
                 new BasicPouchItem(60, Item.Rarity.EPIC),
                 500.0f,
+                true
+        );
+        ItemRegistry.registerItem(
+                "Tacklebox",
+                new TackleboxItem(Item.Rarity.COMMON),
+                50.0f,
                 true
         );
     }
