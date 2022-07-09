@@ -18,20 +18,7 @@ public class getItemStackLimitPatch {
                        @Advice.Argument(0) int slot,
                        @Advice.Argument(1) InventoryItem inventoryItem,
                        @Advice.Return(readOnly=false) int returnedStackSize) {
-        GameLog.debug.printf("inventory: %s \n", inventory.toString());
-        if (inventory instanceof DeepPouchInventory) {
-
-            // region Stack Trace
-            //System.out.println("Printing stack trace.");
-            //StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-            //for (StackTraceElement element : elements) {
-            //    System.out.printf("\tAt %s.%s (%s:%d)\n", element.getClassName(), element.getMethodName(), element.getFileName(), element.getLineNumber());
-            //}
-            // endregion
-
-            GameLog.debug.printf("returnedStackSize: %d, slot %d, inventory: %s inventoryItem: %s \n", returnedStackSize, slot, inventory.toString(), inventoryItem.toString());
-            GameLog.debug.println("inventory is instance of taggedInventory");
-            int multiplicity = ((DeepPouchInventory) inventory).multiplicity;
+        if (inventory instanceof DeepPouchInventory) {int multiplicity = ((DeepPouchInventory) inventory).multiplicity;
             long futureStackSize = ((long) returnedStackSize) * multiplicity;
             InventoryFilter filter = inventory.filter;
             int filterMaxSize = filter == null ? inventoryItem.itemStackSize() : filter.getItemStackLimit(slot, inventoryItem);
@@ -46,7 +33,6 @@ public class getItemStackLimitPatch {
             } else {
                 returnedStackSize = filterMaxSize;
             }
-            GameLog.debug.printf("final returnedStackSize %d", returnedStackSize);
         }
     }
 }
