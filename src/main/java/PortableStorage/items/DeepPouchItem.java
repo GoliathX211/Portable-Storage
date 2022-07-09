@@ -7,6 +7,7 @@ import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
 import necesse.engine.network.gameNetworkData.GNDItemInventory;
+import necesse.engine.util.GameRandom;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTexture.GameSprite;
 import necesse.gfx.gameTexture.GameTexture;
@@ -14,20 +15,18 @@ import necesse.gfx.gameTexture.GameTextureAnim;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
-import necesse.inventory.ItemCombineResult;
-import necesse.level.maps.Level;
 
-import java.awt.*;
-import java.util.HashMap;
+import java.util.Arrays;
 
 public class DeepPouchItem extends BasicPouchItem {
-    public static final long SPEED = 10 * 1000;
     public final int multiplicity;
+    private final int speed;
     private GameTexture[] textures;
 
     public DeepPouchItem(int size, int multiplicity, Rarity rarity) {
         super(size, rarity);
         this.multiplicity = multiplicity;
+        this.speed = GameRandom.globalRandom.getOneOf(1511, 1523, 1531, 1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609, 1613, 1619, 1621, 1627, 1637, 1657, 1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811, 1823, 1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987, 1993, 1997, 1999, 2003, 2011, 2017, 2027, 2029, 2039, 2053, 2063, 2069, 2081, 2083, 2087, 2089, 2099, 2111, 2113, 2129, 2131, 2137, 2141, 2143, 2153, 2161, 2179);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class DeepPouchItem extends BasicPouchItem {
     }
     @Override
     public GameSprite getItemSprite(InventoryItem item, PlayerMob perspective) {
-        float proprotion = ((float) (System.currentTimeMillis() % SPEED)) / SPEED;
+        float proprotion = ((float) (System.currentTimeMillis() % speed)) / speed;
         int index = (int)(proprotion * (float)this.textures.length) % this.textures.length;
         GameTexture toDraw = this.textures[index];
         return new GameSprite(toDraw, 32);
