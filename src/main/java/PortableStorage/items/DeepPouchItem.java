@@ -1,6 +1,7 @@
 package PortableStorage.items;
 
 import PortableStorage.inventory.DeepPouchInventory;
+import PortableStorage.registry.ModTextureRegistry;
 import necesse.engine.GameLog;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
@@ -16,20 +17,18 @@ import necesse.level.maps.Level;
 public class DeepPouchItem extends BasicPouchItem {
     public final int multiplicity;
 
+
     public DeepPouchItem(int size, int multiplicity, Rarity rarity) {
         super(size, rarity);
         this.multiplicity = multiplicity;
-
+        this.itemTexture = ModTextureRegistry.vortexAnimation;
         // this.insertPurposes.add("deepPouchInsert");
     }
 
     @Override
     public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
         ListGameTooltips tooltips = super.getTooltips(item, perspective);
-        tooltips.add(Localization.translate("itemtooltip", "rclickinvopentip"));
         tooltips.add(Localization.translate("itemtooltip", "deepBagExplanation", "multiplier", multiplicity));
-        tooltips.add(Localization.translate("itemtooltip", "bagSize", "size", size));
-        tooltips.add(Localization.translate("itemtooltip", "storedItems", "items", this.getStoredItemAmounts(item)));
         return tooltips;
     }
 

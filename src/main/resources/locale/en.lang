@@ -7,7 +7,7 @@ SmallBag=Small Bag
 MediumBag=Medium Bag
 LargeBag=Large Bag
 ExtraLargeBag=Extra Large Bag
-DeepPouch=Deep Pouch
+DeepBag=Deep Bag
 
 [itemtooltip]
 bagUsage=Right click to open the bag.
