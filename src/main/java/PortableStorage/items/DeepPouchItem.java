@@ -18,15 +18,16 @@ import necesse.inventory.ItemCombineResult;
 import necesse.level.maps.Level;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class DeepPouchItem extends BasicPouchItem {
+    public static final long SPEED = 10 * 1000;
     public final int multiplicity;
-    public GameTexture texture;
+    private GameTexture[] textures;
 
     public DeepPouchItem(int size, int multiplicity, Rarity rarity) {
         super(size, rarity);
         this.multiplicity = multiplicity;
-        this.texture = ModTextureRegistry.vortexAnimation;
     }
 
     @Override
@@ -38,15 +39,15 @@ public class DeepPouchItem extends BasicPouchItem {
     @Override
     public void loadTextures() {
         super.loadTextures();
-        GameTexture DeepBag1 = GameTexture.fromFile("deepbag1");
-        GameTexture DeepBag2 = GameTexture.fromFile("deepbag2");
-        GameTexture DeepBag3 = GameTexture.fromFile("deepbag3");
-        GameTexture DeepBag4 = GameTexture.fromFile("deepbag4");
-        GameTexture DeepBag5 = GameTexture.fromFile("deepbag5");
-        GameTexture DeepBag6 = GameTexture.fromFile("deepbag6");
-        GameTexture DeepBag7 = GameTexture.fromFile("deepbag7");
-        GameTexture DeepBag8 = GameTexture.fromFile("deepbag8");
-        GameTexture[] textures = new GameTexture[] {
+        GameTexture DeepBag1 = GameTexture.fromFile("items/deepbag1");
+        GameTexture DeepBag2 = GameTexture.fromFile("items/deepbag2");
+        GameTexture DeepBag3 = GameTexture.fromFile("items/deepbag3");
+        GameTexture DeepBag4 = GameTexture.fromFile("items/deepbag4");
+        GameTexture DeepBag5 = GameTexture.fromFile("items/deepbag5");
+        GameTexture DeepBag6 = GameTexture.fromFile("items/deepbag6");
+        GameTexture DeepBag7 = GameTexture.fromFile("items/deepbag7");
+        GameTexture DeepBag8 = GameTexture.fromFile("items/deepbag8");
+        textures = new GameTexture[] {
                 DeepBag1,
                 DeepBag2,
                 DeepBag3,
@@ -56,19 +57,19 @@ public class DeepPouchItem extends BasicPouchItem {
                 DeepBag7,
                 DeepBag8,
         };
-        this.texture = new GameTextureAnim(16, 16, 1, textures);
     }
     @Override
     public GameSprite getItemSprite(InventoryItem item, PlayerMob perspective) {
-        return new GameSprite(this.itemTexture, 32);
+        float proprotion = ((float) (System.currentTimeMillis() % SPEED)) / SPEED;
+        int index = (int)(proprotion * (float)this.textures.length) % this.textures.length;
+        GameTexture toDraw = this.textures[index];
+        return new GameSprite(toDraw, 32);
     }
 
     @Override
     public DeepPouchInventory getInternalInventory(InventoryItem item) {
         GNDItem gndItem = item.getGndData().getItem("DeepInventory");
         if (gndItem instanceof GNDDeepItemInventory) {
-            GameLog.debug.println("GNDItem is type if GNDItemInventory.");
-            GameLog.debug.println("Inventory type" + ((GNDDeepItemInventory) gndItem).inventory.getClass());
             GNDDeepItemInventory gndInventory = (GNDDeepItemInventory) gndItem;
             if (gndInventory.inventory.getSize() != this.getInternalInventorySize()) {
                 gndInventory.inventory.changeSize(this.getInternalInventorySize());
@@ -84,7 +85,6 @@ public class DeepPouchItem extends BasicPouchItem {
 
     @Override
     public void saveInternalInventory(InventoryItem item, Inventory inventory) {
-        GameLog.debug.println("saveInternalInventory: " + inventory.getClass().toString());
         GNDItem gndItem = item.getGndData().getItem("DeepInventory");
         if (gndItem instanceof GNDDeepItemInventory) {
             GNDDeepItemInventory gndInventory = (GNDDeepItemInventory)gndItem;
