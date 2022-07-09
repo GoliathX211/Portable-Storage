@@ -8,21 +8,25 @@ import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
 import necesse.engine.network.gameNetworkData.GNDItemInventory;
 import necesse.entity.mobs.PlayerMob;
+import necesse.gfx.gameTexture.GameSprite;
+import necesse.gfx.gameTexture.GameTexture;
+import necesse.gfx.gameTexture.GameTextureAnim;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
 import necesse.inventory.ItemCombineResult;
 import necesse.level.maps.Level;
 
+import java.awt.*;
+
 public class DeepPouchItem extends BasicPouchItem {
     public final int multiplicity;
-
+    public GameTexture texture;
 
     public DeepPouchItem(int size, int multiplicity, Rarity rarity) {
         super(size, rarity);
         this.multiplicity = multiplicity;
-        this.itemTexture = ModTextureRegistry.vortexAnimation;
-        // this.insertPurposes.add("deepPouchInsert");
+        this.texture = ModTextureRegistry.vortexAnimation;
     }
 
     @Override
@@ -30,6 +34,33 @@ public class DeepPouchItem extends BasicPouchItem {
         ListGameTooltips tooltips = super.getTooltips(item, perspective);
         tooltips.add(Localization.translate("itemtooltip", "deepBagExplanation", "multiplier", multiplicity));
         return tooltips;
+    }
+    @Override
+    public void loadTextures() {
+        super.loadTextures();
+        GameTexture DeepBag1 = GameTexture.fromFile("deepbag1");
+        GameTexture DeepBag2 = GameTexture.fromFile("deepbag2");
+        GameTexture DeepBag3 = GameTexture.fromFile("deepbag3");
+        GameTexture DeepBag4 = GameTexture.fromFile("deepbag4");
+        GameTexture DeepBag5 = GameTexture.fromFile("deepbag5");
+        GameTexture DeepBag6 = GameTexture.fromFile("deepbag6");
+        GameTexture DeepBag7 = GameTexture.fromFile("deepbag7");
+        GameTexture DeepBag8 = GameTexture.fromFile("deepbag8");
+        GameTexture[] textures = new GameTexture[] {
+                DeepBag1,
+                DeepBag2,
+                DeepBag3,
+                DeepBag4,
+                DeepBag5,
+                DeepBag6,
+                DeepBag7,
+                DeepBag8,
+        };
+        this.texture = new GameTextureAnim(16, 16, 1, textures);
+    }
+    @Override
+    public GameSprite getItemSprite(InventoryItem item, PlayerMob perspective) {
+        return new GameSprite(this.itemTexture, 32);
     }
 
     @Override
