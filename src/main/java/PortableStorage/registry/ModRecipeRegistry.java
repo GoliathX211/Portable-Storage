@@ -50,5 +50,42 @@ public class ModRecipeRegistry {
                         new Ingredient("ancientfossilbar", 10)
                 }
         ).showAfter("LargeBag"));
+
+        Recipes.registerModRecipe(new Recipe(
+                "TacoBox",
+                1,
+                RecipeTechRegistry.ADVANCED_WORKSTATION,
+                new Ingredient[]{
+                        new Ingredient("fishtaco", 25),
+                        new Ingredient("palmdinnertable", 1),
+                        new Ingredient("wool", 25)
+                },
+                true
+
+        ));
+
+        Recipes.registerModRecipe(new Recipe(
+                "DeepBag",
+                1,
+                RecipeTechRegistry.DEMONIC,
+                new Ingredient[] {
+                        new Ingredient("SmallBag", 4),
+                        new Ingredient("voidshard", 20),
+                        new Ingredient("demonicbar", 15),
+                        new Ingredient("voidpouch", 2),
+                        new Ingredient("darkgem", 1)
+                }
+        ).showAfter("SmallBag"));
+
+        Recipes.registerModRecipe(new Recipe(
+                "DeeperBag",
+                1,
+                RecipeTechRegistry.ADVANCED_WORKSTATION,
+                new Ingredient[] {
+                        new Ingredient("DeepBag", 2),
+                        new Ingredient("ExtraLargeBag", 1),
+                        new Ingredient("tungstenbar", 20)
+                }
+        ).showAfter("DeepBag"));
     }
 }
