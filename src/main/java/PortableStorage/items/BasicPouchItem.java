@@ -15,7 +15,7 @@ import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.PouchItem;
 
 public class BasicPouchItem extends PouchItem {
-    private int size;
+    protected final int size;
     public BasicPouchItem(int size, Rarity rarity){
         this.rarity = rarity;
         this.size = size;
@@ -65,7 +65,7 @@ public class BasicPouchItem extends PouchItem {
     public boolean isValidRequestItem(Item var1) {
         return !(var1 instanceof PouchItem);
     }
- 
+
     /*
     @Override
     public boolean isValidRequestItem(Item var1) {
