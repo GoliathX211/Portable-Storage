@@ -1,9 +1,14 @@
 # About
 
-A starter project to help save time when creating a new mod. The project structure tries to follow the official Necesse as much as possible, without becoming redundnant. Folders have mostly only been provided for examples, but where new things would go should hopefully make sense. 
+This project is about solving the issue of inventory storage. 
+In Necesse you have items that can hold specific items such as the Ammo Pouch, Lunchbox, and Potion Pouch. You also have a special type of storage option which is linked to your player: Void Pouch and Void Bag. The Void Pouch gives you access to 20 slots for your items and no matter which Void Pouch you open, you will have access to the same items. If you are familiar with Minecraft, this is very similiar to the ender chests. Though one big difference is that the Void Bag holds 40 slots but the first 20 are actually the same slots as the Void Pouch.
 
-The mod also includes register methods for **most** things you'd want to register, ordered as recommended by the Necesse developer. It is recommended to register things exclusively in the created registrars. 
+This mod is my solution to this problem and also my introductory learning process to Java programming.
+Deadly990, my coauthor, has been teaching me the right way to do things and this project would not have gotten anywhere without his help.
 
-You can find [community documentation and guides here](https://necesse-community.github.io/unofficial-docs/#/)
+# Translations
 
-You can find [the official WIKI page here](https://necessewiki.com/Modding)
+I would like to say that I am opening up the possibility for translations. If you would like to translate this mod you need to download the en.lang file and translate the text after the equals sign.
+Link to en.lang: https://github.com/GoliathX211/Portable-Storage/blob/b9a70bb66187f0d8002470325bccd86e182c595d/src/main/resources/locale/en.lang.
+
+Thank you for all your support and I am happy to be developing this mod for you.
