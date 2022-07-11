@@ -1,0 +1,26 @@
+[tile]
+
+[object]
+
+[item]
+SmallBag=Mochila Pequena
+MediumBag=Mochila Média
+LargeBag=Mochila Grande
+ExtraLargeBag=Mochila Extra Grande
+DeepBag=Mochila Profunda
+DeeperBag=Mochila Mais Profunda
+Tacklebox=Caixa de equipamentos
+TacoBox=Caixa de Tacos
+
+
+[itemtooltip]
+bagUsage=Clique com o botão direito do mouse para abrir a mochila.
+bagSize=Contagem de slots: <size>
+storedItems=Itens armazenados: <items>
+deepBagExplanation=Esta mochila segura <multiplier>x itens a mais por pilha!
+tackleboxExplanation=Este mochila contém apenas itens da categoria de isca.
+tacoBoxExplanation=Esta bolsa só contém itens que são tacos.
+
+[mob]
+
+[buff]
