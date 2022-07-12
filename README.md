@@ -12,3 +12,7 @@ Deadly990, my coauthor, has been teaching me the right way to do things and this
 I would like to say that I am opening up the possibility for translations. If you would like to translate this mod you need to download the [en.lang](src/main/resources/locale/en.lang) file and translate the text after the equals sign.
 
 Thank you for all your support and I am happy to be developing this mod for you.
+
+# Wiki
+
+I have moved all information from this README.md to a [wiki](https://github.com/GoliathX211/Portable-Storage/wiki) page on github.
