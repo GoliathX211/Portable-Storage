@@ -77,7 +77,7 @@ public class ModItemsRegistry {
         );
         ItemRegistry.registerItem(
                 "Tacklebox",
-                new TackleboxItem(Item.Rarity.COMMON),
+                new TackleboxItem(10, Item.Rarity.COMMON),
                 50.0f,
                 true
         );

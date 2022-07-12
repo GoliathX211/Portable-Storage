@@ -1,7 +1,6 @@
 package PortableStorage.inventory;
 
 import PortableStorage.InventoryItem.DeepPouchInventoryItem;
-import PortableStorage.items.DeepPouchItem;
 import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
@@ -124,7 +123,7 @@ public class DeepPouchInventory extends Inventory {
             }
 
             sorted.forEach((ix) -> {
-                sortedInv.addItem((Level)null, (PlayerMob)null, ix, startSlot, endSlot, "sort");
+                sortedInv.addItem(null, null, ix, startSlot, endSlot, "sort");
             });
             this.override(sortedInv);
 

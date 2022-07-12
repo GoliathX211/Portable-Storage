@@ -29,7 +29,7 @@ public class DeepPouchInventoryItem extends InventoryItem {
     }
 
     public DeepPouchInventoryItem(Item item, int multiplicity) {
-        this((Item)item, 1, multiplicity);
+        this(item, 1, multiplicity);
     }
 
     public DeepPouchInventoryItem(String itemStringID, int amount, int multiplicity) {
@@ -130,7 +130,7 @@ public class DeepPouchInventoryItem extends InventoryItem {
     }
 
     public static DeepPouchInventoryItem fromLoadData(LoadData save) {
-        Item item = ItemSave.loadItem(save.getUnsafeString("stringID", (String)null));
+        Item item = ItemSave.loadItem(save.getUnsafeString("stringID", null));
         if (item == null) {
             return null;
         } else {

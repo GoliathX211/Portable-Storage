@@ -1,16 +1,12 @@
 package PortableStorage.items;
 
 import necesse.engine.localization.Localization;
-import necesse.engine.localization.message.GameMessage;
-import necesse.engine.localization.message.StaticMessage;
-import necesse.engine.network.packet.PacketOpenContainer;
-import necesse.engine.network.server.ServerClient;
-import necesse.engine.registries.ContainerRegistry;
+import necesse.engine.network.gameNetworkData.GNDItem;
+import necesse.engine.network.gameNetworkData.GNDItemInventory;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
-import necesse.inventory.container.item.ItemInventoryContainer;
 import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.PouchItem;
 
@@ -46,6 +42,31 @@ public class BasicPouchItem extends PouchItem {
         ContainerRegistry.openAndSendContainer(client, p);
     }
     */
+
+
+    @Override
+    public Inventory getInternalInventory(InventoryItem item) {
+        GNDItem gndItem = item.getGndData().getItem("inventory");
+        Inventory inventory = new Inventory(this.getInternalInventorySize()) {
+            @Override
+            public boolean canLockItem(int slot) {
+                return true;
+            }
+        };
+
+        if (gndItem instanceof GNDItemInventory) {
+            GNDItemInventory gndInventory = (GNDItemInventory)gndItem;
+            if (gndInventory.inventory.getSize() != this.getInternalInventorySize()) {
+                gndInventory.inventory.changeSize(this.getInternalInventorySize());
+            }
+
+            inventory.override(gndInventory.inventory);
+        }
+        item.getGndData().setItem("inventory", new GNDItemInventory(inventory));
+        return inventory;
+
+    }
+
     @Override
     public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
         ListGameTooltips tooltips = super.getTooltips(item, perspective);
