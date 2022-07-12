@@ -1,0 +1,26 @@
+[tile]
+
+[object]
+
+[item]
+SmallBag=Bolsa Pequenã
+MediumBag=Bolsa Mediana
+LargeBag=Bolsa Grande
+ExtraLargeBag=Bolsa Extra Grande
+DeepBag=Bolsa Profunda
+DeeperBag=Bolsa Más Profunda
+Tacklebox=Caixa de Anzulejos
+TacoBox=Caja De Tacos
+
+
+[itemtooltip]
+bagUsage=Haz clic derecho para abrir la bolsa.
+bagSize=Número de ranuras: <size>
+storedItems=Artículos almacenados: <items>
+deepBagExplanation=¡Esta bolsa tiene capacidad para <multiplier>x artículos más por pila!
+tackleboxExplanation=Esta bolsa solo contiene artículos de la categoría de cebo.
+tacoBoxExplanation=Esta bolsa solo contiene artículos que son tacos.
+
+[mob]
+
+[buff]

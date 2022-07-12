@@ -1,0 +1,26 @@
+[tile]
+
+[object]
+
+[item]
+SmallBag=小包
+MediumBag=中号包
+LargeBag=大包
+ExtraLargeBag=特大号包
+DeepBag=深袋
+DeeperBag=更深的包
+Tacklebox=钓具箱
+TacoBox=炸玉米饼盒
+
+
+[itemtooltip]
+bagUsage=右击打开包。
+bagSize=插槽数：<size>
+storedItems=存储的项目：<items>
+deepBagExplanation=这个袋子每叠可容纳 <multiplier>x 个物品！
+trackboxExplanation=这个包只装诱饵类的物品。
+tacoBoxExplanation=这个包只装炸玉米饼类的物品。
+
+[mob]
+
+[buff]
