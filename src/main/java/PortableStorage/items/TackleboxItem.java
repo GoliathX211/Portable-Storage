@@ -7,17 +7,15 @@ import necesse.inventory.InventoryItem;
 import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.PouchItem;
 
-public class TackleboxItem extends PouchItem {
-    public TackleboxItem(Rarity rarity) {
-        this.rarity = rarity;
-        drawStoredItems =true;
+public class TackleboxItem extends BasicPouchItem {
+    public TackleboxItem(int size, Rarity rarity) {
+        super(size, rarity);
+        drawStoredItems = true;
     }
 
     @Override
     public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
         ListGameTooltips tooltips = super.getTooltips(item, perspective);
-        tooltips.add(Localization.translate("itemtooltip", "rclickinvopentip"));
-        tooltips.add(Localization.translate("itemtooltip", "storedItems", "items", this.getStoredItemAmounts(item)));
         tooltips.add(Localization.translate("itemtooltip", "tackleboxExplanation"));
         return tooltips;
     }
@@ -38,6 +36,6 @@ public class TackleboxItem extends PouchItem {
 
     @Override
     public int getInternalInventorySize() {
-        return 10;
+        return this.size;
     }
 }

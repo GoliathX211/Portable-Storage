@@ -1,8 +1,6 @@
 package PortableStorage.items;
 
 import PortableStorage.inventory.DeepPouchInventory;
-import PortableStorage.registry.ModTextureRegistry;
-import necesse.engine.GameLog;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
@@ -11,12 +9,9 @@ import necesse.engine.util.GameRandom;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTexture.GameSprite;
 import necesse.gfx.gameTexture.GameTexture;
-import necesse.gfx.gameTexture.GameTextureAnim;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
-
-import java.util.Arrays;
 
 public class DeepPouchItem extends BasicPouchItem {
     public final int multiplicity;
@@ -75,7 +70,7 @@ public class DeepPouchItem extends BasicPouchItem {
         GNDItem gndItem = item.getGndData().getItem("DeepInventory");
         if (gndItem instanceof GNDDeepItemInventory) {
             GNDDeepItemInventory gndInventory = (GNDDeepItemInventory)gndItem;
-            gndInventory.inventory.override((DeepPouchInventory) inventory, true, true);
+            gndInventory.inventory.override(inventory, true, true);
         } else {
             item.getGndData().setItem("DeepInventory", new GNDDeepItemInventory((DeepPouchInventory) inventory));
         }
