@@ -1,0 +1,26 @@
+[tile]
+
+[object]
+
+[item]
+SmallBag=Маленький Рюкзак
+MediumBag=Средний Рюкзак
+LargeBag=Большой Рюкзак
+ExtraLargeBag=Очень Большой Рюкзак
+DeepBag=Глубокий Рюкзак
+DeeperBag=Очень Глубокий Рюкзак
+Tacklebox=Ящик Снастей
+TacoBox=Ящик Тако
+
+
+[itemtooltip]
+bagUsage=ПКМ, чтобы открыть рюкзак
+bagSize=Количество слотов: <размер>
+storedItems=Проданные предметы: <предметы>
+deepBagExplanation=В этом рюкзаке в <множитель>x больше предметов, чем в стаке!
+tackleboxExplanation=В этом рюкзаке может быть только наживка.
+tacoBoxExplanation=В этом рюкзаке могут быть только тако.
+
+[mob]
+
+[buff]
