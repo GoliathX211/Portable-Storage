@@ -16,8 +16,6 @@ public class TackleboxItem extends BasicPouchItem {
     @Override
     public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
         ListGameTooltips tooltips = super.getTooltips(item, perspective);
-        tooltips.add(Localization.translate("itemtooltip", "rclickinvopentip"));
-        tooltips.add(Localization.translate("itemtooltip", "storedItems", "items", this.getStoredItemAmounts(item)));
         tooltips.add(Localization.translate("itemtooltip", "tackleboxExplanation"));
         return tooltips;
     }

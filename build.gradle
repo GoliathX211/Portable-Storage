@@ -8,10 +8,10 @@ plugins {
 def modInfo = [
         modID          : "goliath.portablestorage",
         modName        : "Portable Storage",
-        modVersion     : "1.01",
+        modVersion     : "1.10",
         gameVersion    : "0.21.23",
         modDescription : "Implements unique storage bags so you can store all your items.",
-        author         : "GoliathX211...Deadly990",
+        author         : "GoliathX211; Deadly990",
         clientside     : false,
         modDependencies         : [],
         modOptionalDependencies : [],
