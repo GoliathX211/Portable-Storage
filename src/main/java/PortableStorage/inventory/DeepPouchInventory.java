@@ -5,10 +5,7 @@ import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
 import necesse.entity.mobs.PlayerMob;
-import necesse.inventory.Inventory;
-import necesse.inventory.InventoryFilter;
-import necesse.inventory.InventoryItem;
-import necesse.inventory.ItemCombineResult;
+import necesse.inventory.*;
 import necesse.level.maps.Level;
 
 import java.util.*;
@@ -20,6 +17,44 @@ public class DeepPouchInventory extends Inventory {
         super(size);
         this.multiplicity = multiplicity;
     }
+    @Override
+    public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
+w        boolean out = false;
+        Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
+
+        while(var10.hasNext()) {
+            SlotPriority slotPriority = (SlotPriority)var10.next();
+            if (input.getAmount() <= 0) {
+                break;
+            }
+
+            boolean isValid = ignoreValid || this.isItemValid(slotPriority.slot, input);
+            int stackLimit = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(slotPriority.slot, input);
+            InventoryItem invItem = this.getItem(slotPriority.slot);
+            boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, invItem, input, stackLimit, input.getAmount(), purpose);
+            if (invAddItemResult) {
+                out = true;
+                this.updateSlot(slotPriority.slot);
+            }
+        }
+
+        for(int i = startSlot; i <= endSlot && input.getAmount() > 0; ++i) {
+            if (this.isSlotClear(i) && (ignoreValid || this.isItemValid(i, input))) {
+                int combineAmount = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(i, input);
+                int amount = Math.min(input.getAmount(), combineAmount);
+                if (amount > 0) {
+                    InventoryItem insert = input.copy(amount);
+                    this.setItem(i, insert);
+                    input.setAmount(input.getAmount() - amount);
+                    out = true;
+                }
+            }
+        }
+
+        return out;
+    }
+
+
     @Override
     public DeepPouchInventory copy() {
 
