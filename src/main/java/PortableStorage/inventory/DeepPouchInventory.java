@@ -19,7 +19,7 @@ public class DeepPouchInventory extends Inventory {
     }
     @Override
     public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
-w        boolean out = false;
+        boolean out = false;
         Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
 
         while(var10.hasNext()) {
