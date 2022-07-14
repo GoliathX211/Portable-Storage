@@ -13,19 +13,25 @@ import java.util.ArrayList;
 @ModMethodPatch(target = AnglerHumanMob.class, name = "getShopItems", arguments = {VillageShopsData.class, ServerClient.class})
 public class getShopItemsPatch {
     @Advice.OnMethodExit()
-    static void onExit(
+    static ArrayList<ShopItem> onExit(
             @Advice.This AnglerHumanMob angler,
             @Advice.Return(readOnly = false) ArrayList<ShopItem> list
     ) {
         GameRandom random = GameRandom.globalRandom;
-        list.add(ShopItem.item(
-                "Tacklebox",
-                angler.getRandomHappinessPrice(
-                        random,
-                        1500,
-                        2000,
-                        1750)
-        ));
+        if (angler.isTravelingHuman()) {
+            return null;
+        }
+        else {
+            list.add(ShopItem.item(
+                    "Tacklebox",
+                    angler.getRandomHappinessPrice(
+                            random,
+                            1500,
+                            2000,
+                            1750)
+            ));
+            return list;
+        }
     }
 }
 
