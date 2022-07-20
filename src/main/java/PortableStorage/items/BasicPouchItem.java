@@ -5,6 +5,8 @@ import PortableStorage.inventory.DeepPouchInventory;
 import PortableStorage.inventory.PouchInventory;
 import PortableStorage.registry.ModContainerRegistry;
 import necesse.engine.localization.Localization;
+import necesse.engine.localization.message.GameMessage;
+import necesse.engine.localization.message.StaticMessage;
 import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
 import necesse.engine.network.gameNetworkData.GNDItemInventory;
@@ -12,6 +14,7 @@ import necesse.engine.network.gameNetworkData.GNDPouchItemInventory;
 import necesse.engine.network.packet.PacketOpenContainer;
 import necesse.engine.network.server.ServerClient;
 import necesse.engine.registries.ContainerRegistry;
+import necesse.engine.registries.ItemRegistry;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
@@ -107,4 +110,12 @@ public class BasicPouchItem extends PouchItem {
     public int getInternalInventorySize() {
         return size;
     }
+
+    public GameMessage getLocalization(InventoryItem item) {
+        if (item.getGndData().hasKey("pouchname")) {
+            return new StaticMessage(item.getGndData().getItem("pouchname").toString());
+        }
+        return ItemRegistry.getLocalization(this.getID());
+    }
+
 }

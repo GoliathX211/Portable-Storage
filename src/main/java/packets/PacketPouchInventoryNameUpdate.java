@@ -1,6 +1,5 @@
 package packets;
 
-import PortableStorage.InventoryItem.PouchInventoryItem;
 import PortableStorage.inventory.PouchInventory;
 import necesse.engine.GameLog;
 import necesse.engine.network.NetworkPacket;
@@ -10,10 +9,12 @@ import necesse.engine.network.PacketWriter;
 import necesse.engine.network.client.Client;
 import necesse.engine.network.server.Server;
 import necesse.engine.network.server.ServerClient;
+import necesse.entity.mobs.PlayerMob;
 import necesse.entity.objectEntity.ObjectEntity;
 import necesse.entity.objectEntity.interfaces.OEInventory;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
+import necesse.inventory.PlayerInventoryManager;
 import necesse.inventory.container.slots.ContainerSlot;
 import necesse.inventory.item.miscItem.PouchItem;
 import necesse.level.maps.Level;
@@ -30,7 +31,7 @@ public class PacketPouchInventoryNameUpdate extends Packet {
         this.name = reader.getNextString();
         this.slot = reader.getNextInt();
     } // The server or client (Receive)
-    public PacketPouchInventoryNameUpdate(PouchInventory pouchInventory, String name, int slot) {
+    public PacketPouchInventoryNameUpdate(String name, int slot) {
         this.name = name;
         this.slot = slot;
         PacketWriter writer = new PacketWriter(this);
@@ -39,7 +40,7 @@ public class PacketPouchInventoryNameUpdate extends Packet {
     } // Sending a packet
 
     public void processServer(NetworkPacket packet, Server server, ServerClient client) {
-        Optional<PouchInventoryItem> pouchInventoryItem = this.getPouchInventoryItem(client);
+        Optional<InventoryItem> pouchInventoryItem = this.getPouchInventoryItem(server, client);
         if (pouchInventoryItem.isPresent()) {
             pouchInventoryItem.flatMap(PacketPouchInventoryNameUpdate::getPouchInventory)
                     .ifPresent(inventory -> inventory.setInventoryName(this.name, pouchInventoryItem.get()));
@@ -49,29 +50,25 @@ public class PacketPouchInventoryNameUpdate extends Packet {
         }
     }
     public void processClient(NetworkPacket packet, Client client) {
-        Optional<PouchInventoryItem> pouchInventoryItem = getPouchInventoryItem(client);
+        Optional<InventoryItem> pouchInventoryItem = getPouchInventoryItem(client);
         pouchInventoryItem.flatMap(PacketPouchInventoryNameUpdate::getPouchInventory)
                 .ifPresent(inventory -> inventory.setInventoryName(this.name, pouchInventoryItem.get()));
     }
 
-    private Optional<PouchInventoryItem> getPouchInventoryItem(ServerClient client) {
-        InventoryItem inventoryItem = client.getContainer().getSlot(this.slot).getItem();
-        if (inventoryItem instanceof PouchInventoryItem) {
-            return Optional.of((PouchInventoryItem) inventoryItem);
-        }
-        return Optional.empty();
+    private Optional<InventoryItem> getPouchInventoryItem(Server server, ServerClient client) {
+        PlayerMob player = server.getPlayer(client.slot);
+        PlayerInventoryManager pinv = player.getInv();
+        InventoryItem inventoryItem = pinv.main.getItem(this.slot);
+            return Optional.ofNullable(inventoryItem);
     }
-    private Optional<PouchInventoryItem> getPouchInventoryItem(Client client) {
+    private Optional<InventoryItem> getPouchInventoryItem(Client client) {
         InventoryItem inventoryItem = client.getContainer().getSlot(this.slot).getItem();
-        if (inventoryItem instanceof PouchInventoryItem) {
-            return Optional.of((PouchInventoryItem) inventoryItem);
-        }
-        return Optional.empty();
+        return Optional.ofNullable( inventoryItem);
     }
 
 
 
-    private static Optional<PouchInventory> getPouchInventory(PouchInventoryItem pouchInventoryItem) {
+    private static Optional<PouchInventory> getPouchInventory(InventoryItem pouchInventoryItem) {
         if (pouchInventoryItem.item instanceof PouchItem) {
             Inventory inventory = ((PouchItem) pouchInventoryItem.item).getInternalInventory(pouchInventoryItem);
             if (inventory instanceof PouchInventory) {

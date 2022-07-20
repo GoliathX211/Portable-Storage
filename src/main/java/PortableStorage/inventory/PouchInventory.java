@@ -1,11 +1,11 @@
 package PortableStorage.inventory;
 
-import PortableStorage.InventoryItem.PouchInventoryItem;
 import necesse.engine.localization.message.GameMessage;
 import necesse.engine.localization.message.StaticMessage;
 import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
+import necesse.engine.network.gameNetworkData.GNDItemString;
 import necesse.entity.mobs.PlayerMob;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
@@ -59,7 +59,6 @@ public class PouchInventory extends Inventory {
 
         return out;
     }
-
     @Override
     public boolean canLockItem(int slot) {
         return true;
@@ -97,13 +96,21 @@ public class PouchInventory extends Inventory {
 
     }
 
-    public GameMessage getInventoryName(Optional<PouchInventoryItem> inventoryItem) {
-        return inventoryItem.map(PouchInventoryItem::getInventoryItemName)
+    public GameMessage getInventoryName(Optional<InventoryItem> inventoryItem) {
+        return inventoryItem.flatMap(PouchInventory::getInventoryItemName)
                 .orElse(new StaticMessage(this.defaultName));
 
     }
-    public void setInventoryName(String name, PouchInventoryItem inventoryItem) {
-        inventoryItem.setInventoryItemName(name);
+
+    private static Optional<GameMessage> getInventoryItemName(InventoryItem inventoryItem) {
+        if (inventoryItem.getGndData().hasKey("pouchname")) {
+            return Optional.of(new StaticMessage(inventoryItem.getGndData().getItem("pouchname").toString()));
+        }
+        return Optional.empty();
+    }
+
+    public void setInventoryName(String name, InventoryItem inventoryItem) {
+         inventoryItem.getGndData().setItem("pouchname", new GNDItemString(name));
     }
 
     public boolean canSetInventoryName() {
