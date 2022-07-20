@@ -59,7 +59,7 @@ public class DeepPouchItem extends BasicPouchItem {
             return gndInventory.inventory;
 
         } else {
-            DeepPouchInventory inventory = new DeepPouchInventory(this.getInternalInventorySize(), this.multiplicity);
+            DeepPouchInventory inventory = new DeepPouchInventory(this.getInternalInventorySize(), this.multiplicity, Localization.translate("item", this.getStringID()));
             item.getGndData().setItem("DeepInventory", new GNDItemInventory(inventory));
             return inventory;
         }

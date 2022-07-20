@@ -1,14 +1,25 @@
 package PortableStorage.items;
 
+import PortableStorage.container.PouchInventoryContainer;
+import PortableStorage.inventory.DeepPouchInventory;
+import PortableStorage.inventory.PouchInventory;
+import PortableStorage.registry.ModContainerRegistry;
 import necesse.engine.localization.Localization;
+import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
 import necesse.engine.network.gameNetworkData.GNDItemInventory;
+import necesse.engine.network.gameNetworkData.GNDPouchItemInventory;
+import necesse.engine.network.packet.PacketOpenContainer;
+import necesse.engine.network.server.ServerClient;
+import necesse.engine.registries.ContainerRegistry;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
 import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.PouchItem;
+import necesse.inventory.recipe.Ingredient;
+import necesse.level.maps.Level;
 
 public class BasicPouchItem extends PouchItem {
     protected final int size;
@@ -18,53 +29,27 @@ public class BasicPouchItem extends PouchItem {
         drawStoredItems = false;
 
     }
-    /*
-    ITEM_INVENTORY_CONTAINER = registerContainer((client, uniqueSeed, packet) -> {
-            return new ItemInventoryContainerForm(client, new ItemInventoryContainer(client.getClient(), uniqueSeed, packet));
-        }, (client, uniqueSeed, packet, serverObject) -> {
-            return new ItemInventoryContainer(client, uniqueSeed, packet);
-    */
-
-    /*
-    this.renameTip = new LocalMessage("ui", "renamebutton");
-        if (oeInventory.canSetInventoryName()) {
-            this.edit = (FormContentIconButton)this.inventoryForm.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(Settings.field_161.container_rename), new GameMessage[]{this.renameTip}));
-            this.edit.onClicked((e) -> {
-                this.label.setTyping(!this.label.isTyping());
-                this.runEditUpdate();
-            });
-        }
-    */
-    /*
     @Override
-    protected void openContainer(ServerClient client, int slotIndex) {
-        PacketOpenContainer p = new PacketOpenContainer(ContainerRegistry.ITEM_INVENTORY_CONTAINER, ItemInventoryContainer.getContainerContent(this, slotIndex));
-        ContainerRegistry.openAndSendContainer(client, p);
-    }
-    */
-
-
-    @Override
-    public Inventory getInternalInventory(InventoryItem item) {
-        GNDItem gndItem = item.getGndData().getItem("inventory");
-        Inventory inventory = new Inventory(this.getInternalInventorySize()) {
-            @Override
-            public boolean canLockItem(int slot) {
-                return true;
-            }
-        };
-
-        if (gndItem instanceof GNDItemInventory) {
-            GNDItemInventory gndInventory = (GNDItemInventory)gndItem;
+    public PouchInventory getInternalInventory(InventoryItem item) {
+        GNDItem gndItem = item.getGndData().getItem("PouchInventory");
+        if (gndItem instanceof GNDPouchItemInventory) {
+            GNDPouchItemInventory gndInventory = (GNDPouchItemInventory) gndItem;
             if (gndInventory.inventory.getSize() != this.getInternalInventorySize()) {
                 gndInventory.inventory.changeSize(this.getInternalInventorySize());
             }
+            return gndInventory.inventory;
 
-            inventory.override(gndInventory.inventory);
+        } else {
+            PouchInventory inventory = new PouchInventory(this.getInternalInventorySize(), Localization.translate("item", this.getStringID()));
+            item.getGndData().setItem("PouchInventory", new GNDPouchItemInventory(inventory));
+            return inventory;
         }
-        item.getGndData().setItem("inventory", new GNDItemInventory(inventory));
-        return inventory;
+    }
 
+    @Override
+    protected void openContainer(ServerClient client, int slotIndex) {
+        PacketOpenContainer p = new PacketOpenContainer(ModContainerRegistry.POUCH_INVENTORY_CONTAINER, PouchInventoryContainer.getContainerContent(this, slotIndex));
+        ContainerRegistry.openAndSendContainer(client, p);
     }
 
     @Override
@@ -76,6 +61,26 @@ public class BasicPouchItem extends PouchItem {
         return tooltips;
     }
 
+    @Override
+    public int removeInventoryAmount(Level level, PlayerMob player, InventoryItem item, Ingredient ingredient, int amount) {
+        Inventory internalInventory = this.getInternalInventory(item);
+        int removed = internalInventory.removeItems(level, player, ingredient, amount);
+        if (removed > 0) {
+            this.saveInternalInventory(item, internalInventory);
+        }
+        if (removed < amount) {
+            for (int index = 0; index < internalInventory.getSize(); index++){
+                if (internalInventory.getItem(index) != null) {
+                    return removed;
+                }
+            }
+            int tempItem = super.removeInventoryAmount(level, player, item, ingredient, amount);
+            return removed + tempItem;
+        }
+        else {
+            return removed;
+        }
+    }
 
     @Override
     public boolean isValidPouchItem(InventoryItem var1) {

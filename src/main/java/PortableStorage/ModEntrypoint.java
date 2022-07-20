@@ -20,6 +20,7 @@ public class ModEntrypoint {
         ModContainerRegistry.RegisterAll();
         ModPacketRegistry.RegisterAll();
         ModQuestRegistry.RegisterAll();
+        ModGNDItemRegistry.RegisterAll();
     }
 
     // Load resources such as textures and music.

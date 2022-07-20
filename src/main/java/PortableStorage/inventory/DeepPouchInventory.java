@@ -10,55 +10,19 @@ import necesse.level.maps.Level;
 
 import java.util.*;
 
-public class DeepPouchInventory extends Inventory {
+public class DeepPouchInventory extends PouchInventory {
     public final int multiplicity;
-
-    public DeepPouchInventory(int size, int multiplicity) {
-        super(size);
+    public DeepPouchInventory(int size, int multiplicity, String defaultName) {
+        super(size, defaultName);
         this.multiplicity = multiplicity;
     }
-    @Override
-    public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
-        boolean out = false;
-        Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
 
-        while(var10.hasNext()) {
-            SlotPriority slotPriority = (SlotPriority)var10.next();
-            if (input.getAmount() <= 0) {
-                break;
-            }
-
-            boolean isValid = ignoreValid || this.isItemValid(slotPriority.slot, input);
-            int stackLimit = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(slotPriority.slot, input);
-            InventoryItem invItem = this.getItem(slotPriority.slot);
-            boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, invItem, input, stackLimit, input.getAmount(), purpose);
-            if (invAddItemResult) {
-                out = true;
-                this.updateSlot(slotPriority.slot);
-            }
-        }
-
-        for(int i = startSlot; i <= endSlot && input.getAmount() > 0; ++i) {
-            if (this.isSlotClear(i) && (ignoreValid || this.isItemValid(i, input))) {
-                int combineAmount = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(i, input);
-                int amount = Math.min(input.getAmount(), combineAmount);
-                if (amount > 0) {
-                    InventoryItem insert = input.copy(amount);
-                    this.setItem(i, insert);
-                    input.setAmount(input.getAmount() - amount);
-                    out = true;
-                }
-            }
-        }
-
-        return out;
-    }
 
 
     @Override
     public DeepPouchInventory copy() {
 
-        DeepPouchInventory inventory = new DeepPouchInventory(this.getSize(), multiplicity);
+        DeepPouchInventory inventory = new DeepPouchInventory(this.getSize(), multiplicity, defaultName);
 
         for(int i = 0; i < this.getSize(); ++i) {
             InventoryItem current = inventory.getItem(i);
@@ -73,7 +37,7 @@ public class DeepPouchInventory extends Inventory {
 
     @Override
     public DeepPouchInventory copy(final int startSlot, int endSlot) {
-        DeepPouchInventory inventory = new DeepPouchInventory(endSlot - startSlot + 1, multiplicity);
+        DeepPouchInventory inventory = new DeepPouchInventory(endSlot - startSlot + 1, multiplicity, defaultName);
         int totalDirty = 0;
 
         for(int i = startSlot; i < endSlot; ++i) {
@@ -97,6 +61,15 @@ public class DeepPouchInventory extends Inventory {
         return inventory;
     }
     @Override
+    public void setItem(int slot, InventoryItem item, boolean overrideIsNew) {
+            if( item == null) {
+                super.setItem(slot, item, overrideIsNew);
+            } else {
+                DeepPouchInventoryItem deepPouchInventoryItem = new DeepPouchInventoryItem(item, multiplicity);
+                super.setItem(slot, deepPouchInventoryItem, overrideIsNew);
+            }
+    }
+    @Override
     public ItemCombineResult combineItem(Level level, PlayerMob player, int staySlot, InventoryItem combineItem, int amount, String purpose) {
         if (!this.isSlotClear(staySlot) && combineItem != null) {
             InventoryItem invItem = this.getItem(staySlot);
@@ -110,26 +83,13 @@ public class DeepPouchInventory extends Inventory {
             return result ? ItemCombineResult.success() : ItemCombineResult.failure();
         }
         return ItemCombineResult.failure();
-        //            return super.combineItem(level, player, staySlot, combineItem, amount, purpose);
-    }
-    @Override
-    public void setItem(int slot, InventoryItem item, boolean overrideIsNew) {
-            if( item == null) {
-                super.setItem(slot, item, overrideIsNew);
-            } else {
-                DeepPouchInventoryItem deepPouchInventoryItem = new DeepPouchInventoryItem(item, multiplicity);
-                super.setItem(slot, deepPouchInventoryItem, overrideIsNew);
-            }
-    }
-    public boolean canLockItem(int slot) {
-        return true;
     }
     @Override
     public void sortItems(int startSlot, int endSlot) {
         if (endSlot < startSlot) {
             throw new IllegalArgumentException("End slot parameter cannot lower than start slot");
         } else if (endSlot - startSlot != 0) {
-            DeepPouchInventory tempInv = new DeepPouchInventory(endSlot - startSlot + 1, multiplicity);
+            DeepPouchInventory tempInv = new DeepPouchInventory(endSlot - startSlot + 1, multiplicity, defaultName);
             PriorityQueue<InventoryItem> sorted = new PriorityQueue<>();
             boolean[] locked = new boolean[this.getSize()];
 
@@ -148,7 +108,7 @@ public class DeepPouchInventory extends Inventory {
                 }
             }
             sorted.removeIf(Objects::isNull);
-            DeepPouchInventory sortedInv = new DeepPouchInventory(this.getSize(), this.multiplicity);
+            DeepPouchInventory sortedInv = new DeepPouchInventory(this.getSize(), this.multiplicity, defaultName);
             sortedInv.override(this);
 
             for(i = startSlot; i <= endSlot; ++i) {
@@ -171,9 +131,11 @@ public class DeepPouchInventory extends Inventory {
     public static DeepPouchInventory getInventory(Packet contentPacket) {
         return getInventory(new PacketReader(contentPacket));
     }
+
     public void writeContent(PacketWriter writer) {
         writer.putNextShortUnsigned(this.getSize());
         writer.putNextShortUnsigned(this.multiplicity);
+        writer.putNextString(defaultName);
 
         for(int i = 0; i < this.getSize(); ++i) {
             boolean hasItem = !this.isSlotClear(i);
@@ -187,7 +149,8 @@ public class DeepPouchInventory extends Inventory {
     public static DeepPouchInventory getInventory(PacketReader reader) {
         int size = reader.getNextShortUnsigned();
         int multiplicity = reader.getNextShortUnsigned();
-        DeepPouchInventory out = new DeepPouchInventory(size, multiplicity);
+        String defaultName = reader.getNextString();
+        DeepPouchInventory out = new DeepPouchInventory(size, multiplicity, defaultName);
 
         for(int i = 0; i < out.getSize(); ++i) {
             if (reader.getNextBoolean()) {

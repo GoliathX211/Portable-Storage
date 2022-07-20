@@ -1,6 +1,6 @@
 package PortableStorage.InventorySave;
 
-import PortableStorage.inventory.DeepPouchInventory;
+import PortableStorage.inventory.PouchInventory;
 import necesse.engine.save.LoadData;
 import necesse.engine.save.SaveData;
 import necesse.inventory.InventoryItem;
@@ -8,23 +8,16 @@ import necesse.inventory.InventoryItem;
 import java.util.Iterator;
 import java.util.List;
 
-public class DeepInventorySave {
-    public DeepInventorySave() {
+public class PouchInventorySave {
+    public PouchInventorySave() {
     }
 
-    public static DeepPouchInventory loadSave(LoadData save) {
+    public static PouchInventory loadSave(LoadData save) {
         String defaultName = save.getSafeString("defaultName", "It's a fuckin' bag yo.");
-        DeepPouchInventory inv = new DeepPouchInventory(Integer.parseInt(save.getFirstDataByName("size")), Integer.parseInt(save.getFirstDataByName("multiplicity")), defaultName) {
-            public boolean canLockItem(int slot) {
-                return true;
-            }
-        };
+        PouchInventory inv = new PouchInventory(Integer.parseInt(save.getFirstDataByName("size")), defaultName);
         List<LoadData> items = save.getLoadDataByName("ITEM");
-        Iterator var3 = items.iterator();
 
-        while(var3.hasNext()) {
-            LoadData itemSave = (LoadData)var3.next();
-
+        for (LoadData itemSave : items) {
             try {
                 boolean locked = itemSave.getFirstLoadDataByName("locked") != null;
                 int slot = itemSave.getInt("slot", -1, false);
@@ -44,16 +37,14 @@ public class DeepInventorySave {
                 System.err.println("Could not load inventory item: " + stringID);
             }
         }
-
         return inv;
     }
 
-    public static SaveData getSave(DeepPouchInventory inv, String componentName) {
+    public static SaveData getSave(PouchInventory inv, String componentName) {
         SaveData save = new SaveData(componentName);
         save.addSafeString("defaultName", inv.defaultName);
-        save.addInt("size", inv.getSize());
-        save.addInt("multiplicity", inv.multiplicity);
 
+        save.addInt("size", inv.getSize());
         for(int i = 0; i < inv.getSize(); ++i) {
             if (!inv.isSlotClear(i) && inv.getItemSlot(i) != null) {
                 SaveData itemSave = new SaveData("ITEM");
@@ -70,8 +61,7 @@ public class DeepInventorySave {
         return save;
     }
 
-    public static SaveData getSave(DeepPouchInventory inv) {
+    public static SaveData getSave(PouchInventory inv) {
         return getSave(inv, "INVENTORY");
     }
 }
-
