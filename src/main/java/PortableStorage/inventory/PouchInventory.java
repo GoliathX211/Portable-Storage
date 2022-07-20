@@ -2,6 +2,7 @@ package PortableStorage.inventory;
 
 import PortableStorage.InventoryItem.PouchInventoryItem;
 import necesse.engine.localization.message.GameMessage;
+import necesse.engine.localization.message.StaticMessage;
 import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
@@ -98,7 +99,7 @@ public class PouchInventory extends Inventory {
 
     public GameMessage getInventoryName(Optional<PouchInventoryItem> inventoryItem) {
         return inventoryItem.map(PouchInventoryItem::getInventoryItemName)
-                .orElse(GameMessage.getNewMessage(this.defaultName));
+                .orElse(new StaticMessage(this.defaultName));
 
     }
     public void setInventoryName(String name, PouchInventoryItem inventoryItem) {
