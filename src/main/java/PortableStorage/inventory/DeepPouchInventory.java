@@ -1,9 +1,10 @@
 package PortableStorage.inventory;
 
-import PortableStorage.InventoryItem.DeepPouchInventoryItem;
 import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
+import necesse.engine.network.gameNetworkData.GNDItemInt;
+import necesse.engine.network.gameNetworkData.GNDItemString;
 import necesse.entity.mobs.PlayerMob;
 import necesse.inventory.*;
 import necesse.level.maps.Level;
@@ -65,8 +66,7 @@ public class DeepPouchInventory extends PouchInventory {
             if( item == null) {
                 super.setItem(slot, item, overrideIsNew);
             } else {
-                DeepPouchInventoryItem deepPouchInventoryItem = new DeepPouchInventoryItem(item, multiplicity);
-                super.setItem(slot, deepPouchInventoryItem, overrideIsNew);
+                super.setItem(slot, item, overrideIsNew);
             }
     }
     @Override
@@ -83,6 +83,7 @@ public class DeepPouchInventory extends PouchInventory {
             return result ? ItemCombineResult.success() : ItemCombineResult.failure();
         }
         return ItemCombineResult.failure();
+        //            return super.combineItem(level, player, staySlot, combineItem, amount, purpose);
     }
     @Override
     public void sortItems(int startSlot, int endSlot) {
