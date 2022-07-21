@@ -1,9 +1,10 @@
 package PortableStorage.inventory;
 
-import PortableStorage.InventoryItem.DeepPouchInventoryItem;
 import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.PacketWriter;
+import necesse.engine.network.gameNetworkData.GNDItemInt;
+import necesse.engine.network.gameNetworkData.GNDItemString;
 import necesse.entity.mobs.PlayerMob;
 import necesse.inventory.*;
 import necesse.level.maps.Level;
@@ -117,8 +118,7 @@ public class DeepPouchInventory extends Inventory {
             if( item == null) {
                 super.setItem(slot, item, overrideIsNew);
             } else {
-                DeepPouchInventoryItem deepPouchInventoryItem = new DeepPouchInventoryItem(item, multiplicity);
-                super.setItem(slot, deepPouchInventoryItem, overrideIsNew);
+                super.setItem(slot, item, overrideIsNew);
             }
     }
     public boolean canLockItem(int slot) {
