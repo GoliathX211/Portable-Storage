@@ -48,7 +48,16 @@ public class BasicPouchItem extends PouchItem {
             return inventory;
         }
     }
-
+    @Override
+    public void saveInternalInventory(InventoryItem item, Inventory inventory) {
+        GNDItem gndItem = item.getGndData().getItem("PouchInventory");
+        if (gndItem instanceof GNDPouchItemInventory) {
+            GNDPouchItemInventory gndInventory = (GNDPouchItemInventory)gndItem;
+            gndInventory.inventory.override(inventory, true, true);
+        } else {
+            item.getGndData().setItem("PouchInventory", new GNDPouchItemInventory((PouchInventory)inventory));
+        }
+    }
     @Override
     protected void openContainer(ServerClient client, int slotIndex) {
         PacketOpenContainer p = new PacketOpenContainer(ModContainerRegistry.POUCH_INVENTORY_CONTAINER, PouchInventoryContainer.getContainerContent(this, slotIndex));
