@@ -49,7 +49,7 @@ public class DeepPouchItem extends BasicPouchItem {
     }
 
     @Override
-    public DeepPouchInventory getInternalInventory(InventoryItem item) {
+    public Inventory getInternalInventory(InventoryItem item) {
         GNDItem gndItem = item.getGndData().getItem("DeepInventory");
         if (gndItem instanceof GNDDeepItemInventory) {
             GNDDeepItemInventory gndInventory = (GNDDeepItemInventory) gndItem;

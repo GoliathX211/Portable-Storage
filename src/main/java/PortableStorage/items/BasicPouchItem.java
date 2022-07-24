@@ -33,7 +33,7 @@ public class BasicPouchItem extends PouchItem {
 
     }
     @Override
-    public PouchInventory getInternalInventory(InventoryItem item) {
+    public Inventory getInternalInventory(InventoryItem item) {
         GNDItem gndItem = item.getGndData().getItem("PouchInventory");
         if (gndItem instanceof GNDPouchItemInventory) {
             GNDPouchItemInventory gndInventory = (GNDPouchItemInventory) gndItem;
@@ -103,13 +103,6 @@ public class BasicPouchItem extends PouchItem {
     public boolean isValidRequestItem(Item var1) {
         return !(var1 instanceof PouchItem);
     }
-
-    /*
-    @Override
-    public boolean isValidRequestItem(Item var1) {
-        if (!(var1 instanceof PouchItem) && )
-    }
-    */
     @Override
     public boolean isValidRequestType(Type var1) {
         return true;
