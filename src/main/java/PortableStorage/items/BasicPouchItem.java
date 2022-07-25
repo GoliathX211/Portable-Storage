@@ -1,15 +1,13 @@
 package PortableStorage.items;
 
-import PortableStorage.container.PouchInventoryContainer;
-import PortableStorage.inventory.DeepPouchInventory;
+import PortableStorage.container.NamedInventoryContainer;
+import PortableStorage.inventory.INamedInventory;
 import PortableStorage.inventory.PouchInventory;
 import PortableStorage.registry.ModContainerRegistry;
 import necesse.engine.localization.Localization;
 import necesse.engine.localization.message.GameMessage;
 import necesse.engine.localization.message.StaticMessage;
-import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
-import necesse.engine.network.gameNetworkData.GNDItemInventory;
 import necesse.engine.network.gameNetworkData.GNDPouchItemInventory;
 import necesse.engine.network.packet.PacketOpenContainer;
 import necesse.engine.network.server.ServerClient;
@@ -60,7 +58,7 @@ public class BasicPouchItem extends PouchItem {
     }
     @Override
     protected void openContainer(ServerClient client, int slotIndex) {
-        PacketOpenContainer p = new PacketOpenContainer(ModContainerRegistry.POUCH_INVENTORY_CONTAINER, PouchInventoryContainer.getContainerContent(this, slotIndex));
+        PacketOpenContainer p = new PacketOpenContainer(ModContainerRegistry.NAMED_INVENTORY_CONTAINER, NamedInventoryContainer.getContainerContent(this, slotIndex));
         ContainerRegistry.openAndSendContainer(client, p);
     }
 
@@ -120,4 +118,7 @@ public class BasicPouchItem extends PouchItem {
         return ItemRegistry.getLocalization(this.getID());
     }
 
+    public INamedInventory createInventory(int size, String name) {
+       return new PouchInventory(size, name);
+    }
 }

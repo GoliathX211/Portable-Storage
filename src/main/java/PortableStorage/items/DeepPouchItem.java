@@ -1,6 +1,8 @@
 package PortableStorage.items;
 
 import PortableStorage.inventory.DeepPouchInventory;
+import PortableStorage.inventory.INamedInventory;
+import PortableStorage.inventory.PouchInventory;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDDeepItemInventory;
 import necesse.engine.network.gameNetworkData.GNDItem;
@@ -52,7 +54,7 @@ public class DeepPouchItem extends BasicPouchItem {
     public Inventory getInternalInventory(InventoryItem item) {
         GNDItem gndItem = item.getGndData().getItem("DeepInventory");
         if (gndItem instanceof GNDDeepItemInventory) {
-            GNDDeepItemInventory gndInventory = (GNDDeepItemInventory) gndItem;
+            GNDItemInventory gndInventory = (GNDItemInventory) gndItem;
             if (gndInventory.inventory.getSize() != this.getInternalInventorySize()) {
                 gndInventory.inventory.changeSize(this.getInternalInventorySize());
             }
@@ -74,5 +76,10 @@ public class DeepPouchItem extends BasicPouchItem {
         } else {
             item.getGndData().setItem("DeepInventory", new GNDDeepItemInventory((DeepPouchInventory) inventory));
         }
+    }
+
+
+    public INamedInventory createInventory(int size, String name) {
+        return new DeepPouchInventory(size, multiplicity, name);
     }
 }

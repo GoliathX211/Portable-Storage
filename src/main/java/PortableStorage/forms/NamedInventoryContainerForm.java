@@ -1,7 +1,7 @@
 package PortableStorage.forms;
 
-import PortableStorage.container.PouchInventoryContainer;
-import PortableStorage.inventory.PouchInventory;
+import PortableStorage.container.NamedInventoryContainer;
+import PortableStorage.inventory.INamedInventory;
 import necesse.engine.Screen;
 import necesse.engine.Settings;
 import necesse.engine.control.Control;
@@ -12,14 +12,12 @@ import necesse.engine.network.client.Client;
 import necesse.gfx.GameColor;
 import necesse.gfx.fairType.TypeParsers;
 import necesse.gfx.fairType.parsers.TypeParser;
-import necesse.gfx.forms.Form;
 import necesse.gfx.forms.components.FormContentIconButton;
 import necesse.gfx.forms.components.FormFlow;
 import necesse.gfx.forms.components.FormInputSize;
 import necesse.gfx.forms.components.FormLabelEdit;
 import necesse.gfx.forms.components.containerSlot.FormContainerSlot;
 import necesse.gfx.forms.presets.containerComponent.ContainerForm;
-import necesse.gfx.forms.presets.containerComponent.item.ItemInventoryContainerForm;
 import necesse.gfx.gameFont.FontOptions;
 import necesse.gfx.gameTexture.GameSprite;
 import necesse.gfx.gameTooltips.GameTooltips;
@@ -28,11 +26,11 @@ import necesse.gfx.ui.ButtonColor;
 import necesse.inventory.InventoryItem;
 import necesse.inventory.container.item.ItemInventoryContainer;
 import necesse.inventory.item.miscItem.InternalInventoryItemInterface;
-import packets.PacketPouchInventoryNameUpdate;
+import packets.PacketNamedInventoryNameUpdate;
 
 import java.util.Optional;
 
-public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> extends ContainerForm<T> {
+public class NamedInventoryContainerForm<T extends NamedInventoryContainer> extends ContainerForm<T> {
     public FormLabelEdit label;
     public FormContentIconButton edit;
     public LocalMessage renameTip;
@@ -41,7 +39,7 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
     public static TypeParser<?>[] getParsers(FontOptions fontOptions) {
         return new TypeParser[]{TypeParsers.GAME_COLOR, TypeParsers.REMOVE_URL, TypeParsers.URL_OPEN, TypeParsers.ItemIcon(fontOptions.getSize()), TypeParsers.InputIcon(fontOptions)};
     }
-    protected PouchItemInventoryContainerForm(Client client, T container, int height) {
+    protected NamedInventoryContainerForm(Client client, T container, int height) {
         super(client,408,  height, container);
         FormFlow iconFlow = new FormFlow(this.getWidth() - 4);
         InternalInventoryItemInterface item = container.inventoryitem;
@@ -103,17 +101,17 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
             sortButton.setCooldown(500);
         }
         this.addSlots();
-        PouchInventory pouchInventory = container.getPouchInventory();
+        INamedInventory namedInventory = container.getPouchInventory();
         FontOptions labelOptions = new FontOptions(20);
         this.label = this.addComponent(new FormLabelEdit("", labelOptions, Settings.UI.activeTextColor, 4, 4, iconFlow.next() - 8, 50), -1000);
         this.label.onMouseChangedTyping((e) -> this.runEditUpdate());
         this.label.onSubmit((e) -> this.runEditUpdate());
-        this.label.allowCaretSetTyping = pouchInventory.canSetInventoryName();
+        this.label.allowCaretSetTyping = namedInventory.canSetInventoryName();
         this.label.allowItemAppend = true;
         this.label.setParsers(getParsers(labelOptions));
-        this.label.setText(pouchInventory.getInventoryName(Optional.of(container.inventoryItemSlot.getItem())).translate());
+        this.label.setText(namedInventory.getInventoryName(Optional.of(container.inventoryItemSlot.getItem())).translate());
         this.renameTip = new LocalMessage("ui", "renamebutton");
-        if (pouchInventory.canSetInventoryName()) {
+        if (namedInventory.canSetInventoryName()) {
             this.edit = this.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(Settings.UI.container_rename), this.renameTip));
             this.edit.onClicked((e) -> {
                 this.label.setTyping(!this.label.isTyping());
@@ -138,28 +136,28 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
         }
 
     }
-    public PouchItemInventoryContainerForm(Client client, T container) {
+    public NamedInventoryContainerForm(Client client, T container) {
         this(client, container, getContainerHeight(container.inventory.getSize(), 10));
     }
 
     private void runEditUpdate() {
-        PouchInventory pouchInventory = this.container.getPouchInventory();
+        INamedInventory namedInventory = this.container.getPouchInventory();
         InventoryItem inventoryItem = this.container.inventoryItemSlot.getItem();
         int slot = this.container.inventoryItemSlot.getInventorySlot();
 
-        if (pouchInventory.canSetInventoryName()) {
+        if (namedInventory.canSetInventoryName()) {
             if (this.label.isTyping()) {
                 this.edit.setIconSprite(new GameSprite(Settings.UI.container_rename_save));
                 this.renameTip = new LocalMessage("ui", "savebutton");
             } else {
-                if (!this.label.getText().equals(pouchInventory.getInventoryName(Optional.of(inventoryItem)).toString())) {
-                    pouchInventory.setInventoryName(this.label.getText(), inventoryItem);
-                    this.client.network.sendPacket(new PacketPouchInventoryNameUpdate(this.label.getText(), slot));
+                if (!this.label.getText().equals(namedInventory.getInventoryName(Optional.of(inventoryItem)).toString())) {
+                    namedInventory.setInventoryName(this.label.getText(), inventoryItem);
+                    this.client.network.sendPacket(new PacketNamedInventoryNameUpdate(this.label.getText(), slot));
                 }
 
                 this.edit.setIconSprite(new GameSprite(Settings.UI.container_rename));
                 this.renameTip = new LocalMessage("ui", "renamebutton");
-                this.label.setText(pouchInventory.getInventoryName(Optional.of(inventoryItem)).translate());
+                this.label.setText(namedInventory.getInventoryName(Optional.of(inventoryItem)).translate());
             }
 
             this.edit.setTooltips(this.renameTip);

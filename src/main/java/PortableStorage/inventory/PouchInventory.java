@@ -43,14 +43,6 @@ public class PouchInventory extends BaseInventory<PouchInventory> implements INa
         writer.putNextString(this.defaultName);
     }
 
-    public void setInventoryName(String name, InventoryItem inventoryItem) {
-         inventoryItem.getGndData().setItem("pouchname", new GNDItemString(name));
-    }
-
-    public boolean canSetInventoryName() {
-        return true;
-    }
-
     @Override
     public String getDefaultName() {
         return this.defaultName;
