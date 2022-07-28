@@ -9,15 +9,18 @@ import necesse.engine.network.gameNetworkData.GNDItemString;
 import necesse.entity.mobs.PlayerMob;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
-import necesse.inventory.ItemCombineResult;
 import necesse.inventory.SlotPriority;
+import necesse.inventory.itemFilter.ItemCategoriesFilter;
 import necesse.level.maps.Level;
 
 import java.util.Iterator;
 import java.util.Optional;
 
 public class PouchInventory extends Inventory {
+    public ItemCategoriesFilter CategoryFilter;
     public final String defaultName;
+    public int priority;
+
     public PouchInventory(int size, String name) {
         super(size);
         this.defaultName = name;
@@ -26,39 +29,48 @@ public class PouchInventory extends Inventory {
     @Override
     public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
         boolean out = false;
-        Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
 
-        while(var10.hasNext()) {
-            SlotPriority slotPriority = (SlotPriority)var10.next();
+        for(SlotPriority slotPriority:this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose)) {
             if (input.getAmount() <= 0) {
                 break;
             }
-
-            boolean isValid = ignoreValid || this.isItemValid(slotPriority.slot, input);
-            int stackLimit = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(slotPriority.slot, input);
-            InventoryItem invItem = this.getItem(slotPriority.slot);
-            boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, invItem, input, stackLimit, input.getAmount(), purpose);
-            if (invAddItemResult) {
-                out = true;
-                this.updateSlot(slotPriority.slot);
-            }
+            out = didAddItemByPriority(level, player, input, purpose, ignoreValid, ignoreStackLimit, slotPriority);
         }
 
         for(int i = startSlot; i <= endSlot && input.getAmount() > 0; ++i) {
-            if (this.isSlotClear(i) && (ignoreValid || this.isItemValid(i, input))) {
-                int combineAmount = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(i, input);
-                int amount = Math.min(input.getAmount(), combineAmount);
-                if (amount > 0) {
-                    InventoryItem insert = input.copy(amount);
-                    this.setItem(i, insert);
-                    input.setAmount(input.getAmount() - amount);
-                    out = true;
-                }
-            }
+            out |= didAddItemToEmpty(input, ignoreValid, ignoreStackLimit, i);
         }
-
         return out;
     }
+
+    private boolean didAddItemToEmpty(InventoryItem input, boolean ignoreValid, boolean ignoreStackLimit, int i) {
+        boolean out = false;
+        if (this.isSlotClear(i) && (ignoreValid || this.isItemValid(i, input))) {
+            int combineAmount = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(i, input);
+            int amount = Math.min(input.getAmount(), combineAmount);
+            if (amount > 0) {
+                InventoryItem insert = input.copy(amount);
+                this.setItem(i, insert);
+                input.setAmount(input.getAmount() - amount);
+                out = true;
+            }
+        }
+        return out;
+    }
+
+    private boolean didAddItemByPriority(Level level, PlayerMob player, InventoryItem input, String purpose, boolean ignoreValid, boolean ignoreStackLimit, SlotPriority slotPriority) {
+        boolean isValid = ignoreValid || this.isItemValid(slotPriority.slot, input);
+        int stackLimit = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(slotPriority.slot, input);
+        InventoryItem invItem = this.getItem(slotPriority.slot);
+        boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, invItem, input, stackLimit, input.getAmount(), purpose);
+        boolean out = false;
+        if (invAddItemResult) {
+            out = true;
+            this.updateSlot(slotPriority.slot);
+        }
+        return out;
+    }
+
     @Override
     public boolean canLockItem(int slot) {
         return true;

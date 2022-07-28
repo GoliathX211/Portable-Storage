@@ -1,1 +1,2 @@
 Settings.field_161 = Settings.UI
+ItemCategory.field_124 = ItemCategory.id
