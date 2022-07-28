@@ -2,10 +2,7 @@ package PortableStorage.forms;
 
 import PortableStorage.container.PouchInventoryContainer;
 import PortableStorage.events.PouchOpenStorageConfigEvent;
-import PortableStorage.events.actions.ChangeAllowedPouchStorageAction;
-import PortableStorage.events.actions.ChangeLimitsPouchStorageAction;
-import PortableStorage.events.actions.FullUpdatePouchStorageAction;
-import PortableStorage.events.actions.PriorityLimitPouchStorageAction;
+import PortableStorage.events.actions.*;
 import PortableStorage.inventory.PouchInventory;
 import necesse.engine.Screen;
 import necesse.engine.Settings;
@@ -47,7 +44,7 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
     private final ChangeLimitsPouchStorageAction changeLimitsStorage;
     private final PriorityLimitPouchStorageAction priorityLimitStorage;
     private final FullUpdatePouchStorageAction fullUpdateSettlementStorage;
-    private final EmptyCustomAction openPouchStorageConfig;
+    private final OpenPouchStorageConfigAction openPouchStorageConfig;
     public FormLabelEdit label;
     public FormContentIconButton edit;
     public LocalMessage renameTip;
@@ -92,9 +89,7 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
 
             this.updateConfigureButtons();
         });
-        this.openPouchStorageConfig = (EmptyCustomAction)container.registerAction(new EmptyCustomAction() {
-
-        });
+        this.openPouchStorageConfig = (OpenPouchStorageConfigAction)container.registerAction(new OpenPouchStorageConfigAction(container));
         this.changeAllowedStorage = (ChangeAllowedPouchStorageAction)container.registerAction(new ChangeAllowedPouchStorageAction(container));
         this.changeLimitsStorage = (ChangeLimitsPouchStorageAction)container.registerAction(new ChangeLimitsPouchStorageAction(container));
         this.priorityLimitStorage = (PriorityLimitPouchStorageAction)container.registerAction(new PriorityLimitPouchStorageAction(container));
@@ -159,7 +154,6 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
         this.configureStorageButton.onClicked((e) -> {
             this.openStorageConfig = true;
             this.openPouchStorageConfig.runAndSend();
-
         });
         this.configureStorageButton.setCooldown(500);
         this.updateConfigureButtons();

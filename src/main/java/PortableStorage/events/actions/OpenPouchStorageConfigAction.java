@@ -26,4 +26,8 @@ public class OpenPouchStorageConfigAction extends ContainerCustomAction {
             }
         }
     }
+
+    public void runAndSend() {
+        System.out.println("Bababooey");
+    }
 }
