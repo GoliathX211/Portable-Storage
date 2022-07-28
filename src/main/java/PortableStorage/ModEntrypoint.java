@@ -21,6 +21,7 @@ public class ModEntrypoint {
         ModPacketRegistry.RegisterAll();
         ModQuestRegistry.RegisterAll();
         ModGNDItemRegistry.RegisterAll();
+        ModEventRegistry.RegisterAll();
     }
 
     // Load resources such as textures and music.
@@ -31,7 +32,6 @@ public class ModEntrypoint {
     public void postInit() {
         ModRecipeRegistry.RegisterAll();
         ModMobsRegistry.RegisterBiomes();
-
         ModCommandsRegistry.RegisterAll();
     }
 

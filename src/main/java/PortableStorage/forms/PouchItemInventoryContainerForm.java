@@ -81,6 +81,7 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
                 this.runEditUpdate();
             });
         }
+        this.switcher = new FormSwitcher();
         addStorageConfigButton(this, iconFlow.next(-26) - 24, 4);
         container.onEvent(PouchOpenStorageConfigEvent.class, (event) -> {
             if (this.openStorageConfig) {
@@ -89,11 +90,11 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
 
             this.updateConfigureButtons();
         });
-        this.openPouchStorageConfig = (OpenPouchStorageConfigAction)container.registerAction(new OpenPouchStorageConfigAction(container));
-        this.changeAllowedStorage = (ChangeAllowedPouchStorageAction)container.registerAction(new ChangeAllowedPouchStorageAction(container));
-        this.changeLimitsStorage = (ChangeLimitsPouchStorageAction)container.registerAction(new ChangeLimitsPouchStorageAction(container));
-        this.priorityLimitStorage = (PriorityLimitPouchStorageAction)container.registerAction(new PriorityLimitPouchStorageAction(container));
-        this.fullUpdateSettlementStorage = (FullUpdatePouchStorageAction)container.registerAction(new FullUpdatePouchStorageAction(container));
+        this.openPouchStorageConfig = container.openStorageConfigAction;
+        this.changeAllowedStorage = container.registerAction(new ChangeAllowedPouchStorageAction(container));
+        this.changeLimitsStorage = container.registerAction(new ChangeLimitsPouchStorageAction(container));
+        this.priorityLimitStorage = container.registerAction(new PriorityLimitPouchStorageAction(container));
+        this.fullUpdateSettlementStorage = container.registerAction(new FullUpdatePouchStorageAction(container));
     }
 
 

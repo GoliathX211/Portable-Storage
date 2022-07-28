@@ -1,5 +1,6 @@
 package PortableStorage.container;
 
+import PortableStorage.events.actions.OpenPouchStorageConfigAction;
 import PortableStorage.inventory.PouchInventory;
 import PortableStorage.items.BasicPouchItem;
 import necesse.engine.localization.Localization;
@@ -9,10 +10,12 @@ import necesse.inventory.container.item.ItemInventoryContainer;
 import necesse.inventory.item.miscItem.InternalInventoryItemInterface;
 
 public class PouchInventoryContainer extends ItemInventoryContainer {
+    public OpenPouchStorageConfigAction openStorageConfigAction;
 
     public PouchInventoryContainer(NetworkClient client, int uniqueSeed, Packet content) {
         super(client, uniqueSeed, content);
         PouchInventory pouchInventory = getPouchInventory();
+        openStorageConfigAction = registerAction(new OpenPouchStorageConfigAction(this));
     }
     public PouchInventory getPouchInventory() {
         if (this.inventory instanceof PouchInventory) {

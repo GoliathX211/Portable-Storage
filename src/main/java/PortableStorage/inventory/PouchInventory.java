@@ -24,6 +24,7 @@ public class PouchInventory extends Inventory {
     public PouchInventory(int size, String name) {
         super(size);
         this.defaultName = name;
+        this.CategoryFilter = new ItemCategoriesFilter(true);
     }
 
     @Override

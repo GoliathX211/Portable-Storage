@@ -3,9 +3,15 @@ package PortableStorage.events.actions;
 import PortableStorage.container.PouchInventoryContainer;
 import PortableStorage.events.PouchOpenStorageConfigEvent;
 import PortableStorage.inventory.PouchInventory;
+import necesse.engine.network.Packet;
 import necesse.engine.network.PacketReader;
 import necesse.engine.network.server.ServerClient;
 import necesse.inventory.container.customAction.ContainerCustomAction;
+import necesse.inventory.container.settlement.SettlementContainerObjectStatusManager;
+import necesse.inventory.container.settlement.events.SettlementBasicsEvent;
+import necesse.inventory.container.settlement.events.SettlementOpenStorageConfigEvent;
+import necesse.level.maps.levelData.settlementData.SettlementInventory;
+import necesse.level.maps.levelData.settlementData.SettlementLevelData;
 
 public class OpenPouchStorageConfigAction extends ContainerCustomAction {
     private final PouchInventoryContainer container;
@@ -28,6 +34,6 @@ public class OpenPouchStorageConfigAction extends ContainerCustomAction {
     }
 
     public void runAndSend() {
-        System.out.println("Bababooey");
+        this.runAndSendAction(new Packet());
     }
 }
