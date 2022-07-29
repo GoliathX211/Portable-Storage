@@ -10,8 +10,8 @@ import necesse.engine.control.Control;
 import necesse.engine.localization.Localization;
 import necesse.engine.localization.message.GameMessage;
 import necesse.engine.localization.message.LocalMessage;
+import necesse.engine.localization.message.StaticMessage;
 import necesse.engine.network.client.Client;
-import necesse.engine.network.server.ServerClient;
 import necesse.gfx.GameColor;
 import necesse.gfx.fairType.TypeParsers;
 import necesse.gfx.fairType.parsers.TypeParser;
@@ -23,6 +23,7 @@ import necesse.gfx.forms.components.containerSlot.FormContainerSlot;
 import necesse.gfx.forms.events.FormEventListener;
 import necesse.gfx.forms.events.FormInputEvent;
 import necesse.gfx.forms.presets.containerComponent.ContainerForm;
+import necesse.gfx.forms.presets.containerComponent.ContainerFormSwitcher;
 import necesse.gfx.gameFont.FontOptions;
 import necesse.gfx.gameTexture.GameSprite;
 import necesse.gfx.gameTexture.GameTexture;
@@ -31,7 +32,6 @@ import necesse.gfx.gameTooltips.StringTooltips;
 import necesse.gfx.ui.ButtonColor;
 import necesse.inventory.InventoryItem;
 import necesse.inventory.container.customAction.EmptyCustomAction;
-import necesse.inventory.container.item.ItemInventoryContainer;
 import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.InternalInventoryItemInterface;
 import necesse.inventory.itemFilter.ItemCategoriesFilter;
@@ -51,12 +51,16 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
     protected FormContainerSlot[] slots;
     private FormContentIconButton configureStorageButton;
     private boolean openStorageConfig;
-    private FormSwitcher switcher;
+    public final ContainerFormSwitcher<T> switcher;
     private PouchStorageConfigForm storageConfigForm;
+    public FormComponent defaultForm;
 
 
     public static TypeParser<?>[] getParsers(FontOptions fontOptions) {
         return new TypeParser[]{TypeParsers.GAME_COLOR, TypeParsers.REMOVE_URL, TypeParsers.URL_OPEN, TypeParsers.ItemIcon(fontOptions.getSize()), TypeParsers.InputIcon(fontOptions)};
+    }
+    public PouchItemInventoryContainerForm(Client client, T container) {
+        this(client, container, getContainerHeight(container.inventory.getSize(), 10));
     }
     public PouchItemInventoryContainerForm(Client client, T container, int height) {
         super(client,408,  height, container);
@@ -81,7 +85,19 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
                 this.runEditUpdate();
             });
         }
-        this.switcher = new FormSwitcher();
+        this.switcher = new ContainerFormSwitcher<T>(client, container) {
+            @Override
+            public void setDefaultPos() {
+                ContainerComponent.setPosFocus(PouchItemInventoryContainerForm.this);
+            }
+
+            @Override
+            public boolean shouldOpenInventory() {
+                return true;
+            }
+        };
+        switcher.addComponent(this);
+        switcher.makeCurrent(this);
         addStorageConfigButton(this, iconFlow.next(-26) - 24, 4);
         container.onEvent(PouchOpenStorageConfigEvent.class, (event) -> {
             if (this.openStorageConfig) {
@@ -96,8 +112,6 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
         this.priorityLimitStorage = container.registerAction(new PriorityLimitPouchStorageAction(container));
         this.fullUpdateSettlementStorage = container.registerAction(new FullUpdatePouchStorageAction(container));
     }
-
-
     private void addButtons(T container, FormFlow iconFlow, InternalInventoryItemInterface pouchItem) {
         if (pouchItem.canQuickStackInventory()) {
             createButton(iconFlow, new GameSprite(Settings.UI.inventory_quickstack_out), "inventoryquickstack", "inventoryquickstackinfo", container.quickStackButton);
@@ -105,49 +119,40 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
         }
 
         if (pouchItem.canRestockInventory()) {
-            createButton(iconFlow, Settings.UI.inventory_quickstack_in, "inventoryrestock", (e) -> {
-                container.restockButton.runAndSend();
-            });
+            createButton(iconFlow, Settings.UI.inventory_quickstack_in, "inventoryrestock", (e) -> container.restockButton.runAndSend());
         }
-        createButton(iconFlow, Settings.UI.container_loot_all, "inventorylootall", (e) -> {
-            container.lootButton.runAndSend();
-        });
+        createButton(iconFlow, Settings.UI.container_loot_all, "inventorylootall", (e) -> container.lootButton.runAndSend());
         if (pouchItem.canSortInventory()) {
-            createButton(iconFlow, Settings.UI.inventory_sort, "inventorysort", (e) -> {
-                container.sortButton.runAndSend();
-            });
+            createButton(iconFlow, Settings.UI.inventory_sort, "inventorysort", (e) -> container.sortButton.runAndSend());
         }
     }
 
     private void createButton(FormFlow iconFlow, GameTexture UI, String nameTranslationKey, FormEventListener<FormInputEvent<FormButton>> action) {
         FormContentIconButton sortButton;
-        sortButton = (FormContentIconButton)this.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(UI), new GameMessage[]{new LocalMessage("ui", nameTranslationKey)}));
+        sortButton = this.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(UI), new LocalMessage("ui", nameTranslationKey)));
         sortButton.onClicked(action);
         sortButton.setCooldown(500);
     }
 
     private void createButton(FormFlow iconFlow, GameSprite buttonIcon, String nameTranslationKey, String useTranslationKey, EmptyCustomAction action) {
         FormContentIconButton button;
-        button = (FormContentIconButton)this.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, buttonIcon, new GameMessage[0]) {
+        button = this.addComponent(new FormContentIconButton(iconFlow.next(-26) - 24, 4, FormInputSize.SIZE_24, ButtonColor.BASE, buttonIcon, new GameMessage[0]) {
             public GameTooltips getTooltips() {
                 StringTooltips tooltips = new StringTooltips(Localization.translate("ui", nameTranslationKey));
                 if (!Screen.isKeyDown(340) && !Screen.isKeyDown(344)) {
                     tooltips.add(Localization.translate("ui", "shiftmoreinfo"), GameColor.LIGHT_GRAY);
                 } else {
-                    tooltips.add(Localization.translate("ui", useTranslationKey, "key", TypeParsers.getInputParseString(Control.INV_LOCK) + "+" + TypeParsers.getInputParseString(-100)), (GameColor)GameColor.LIGHT_GRAY, 400);
+                    tooltips.add(Localization.translate("ui", useTranslationKey, "key", TypeParsers.getInputParseString(Control.INV_LOCK) + "+" + TypeParsers.getInputParseString(-100)), GameColor.LIGHT_GRAY, 400);
                 }
 
                 return tooltips;
             }
         });
-        button.onClicked((e) -> {
-            action.runAndSend();
-        });
+        button.onClicked((e) -> action.runAndSend());
         button.setCooldown(500);
     }
-
     public void addStorageConfigButton(Form form, int x, int y) {
-        this.configureStorageButton = (FormContentIconButton)form.addComponent(new FormContentIconButton(x, y, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(Settings.UI.container_storage_add), new GameMessage[0]) {
+        this.configureStorageButton = form.addComponent(new FormContentIconButton(x, y, FormInputSize.SIZE_24, ButtonColor.BASE, new GameSprite(Settings.UI.container_storage_add), new GameMessage[0]) {
             public GameTooltips getTooltips() {
                 return new StringTooltips(Localization.translate("ui", "settlementconfigurestorage"));
             }
@@ -159,29 +164,24 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
         this.configureStorageButton.setCooldown(500);
         this.updateConfigureButtons();
     }
+
     protected void updateConfigureButtons() {
         this.configureStorageButton.setActive(true);
         this.configureStorageButton.setIconSprite(new GameSprite(Settings.UI.container_storage_config));
     }
-
-
     protected static int getContainerHeight(int inventorySize, int columns) {
         return (inventorySize + columns - 1) / columns * 40 + 38;
     }
-
     protected void addSlots() {
-        this.slots = new FormContainerSlot[((ItemInventoryContainer)this.container).INVENTORY_END - ((ItemInventoryContainer)this.container).INVENTORY_START + 1];
+        this.slots = new FormContainerSlot[this.container.INVENTORY_END - this.container.INVENTORY_START + 1];
 
         for(int i = 0; i < this.slots.length; ++i) {
-            int slotIndex = i + ((ItemInventoryContainer)this.container).INVENTORY_START;
+            int slotIndex = i + this.container.INVENTORY_START;
             int x = i % 10;
             int y = i / 10;
-            this.slots[i] = (FormContainerSlot)this.addComponent(new FormContainerSlot(this.client, slotIndex, 4 + x * 40, 4 + y * 40 + 30));
+            this.slots[i] = this.addComponent(new FormContainerSlot(this.client, slotIndex, 4 + x * 40, 4 + y * 40 + 30));
         }
 
-    }
-    public PouchItemInventoryContainerForm(Client client, T container) {
-        this(client, container, getContainerHeight(container.inventory.getSize(), 10));
     }
 
     private void runEditUpdate() {
@@ -209,8 +209,8 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
     }
     public void setupConfigStorage(final PouchOpenStorageConfigEvent update) {
         PouchInventory inventory = container.getPouchInventory();
-        GameMessage name = inventory.getInventoryName(Optional.ofNullable(container.inventoryItemSlot.getItem()));
-        PouchStorageConfigForm newStorageConfig = (PouchStorageConfigForm)this.addComponent(new PouchStorageConfigForm("storageConfig", 500, 350, inventory, name, update.filter, update.priority) {
+        GameMessage name = inventory.getInventoryName(Optional.empty());
+        PouchStorageConfigForm newStorageConfig = switcher.addComponent(new PouchStorageConfigForm("storageConfig", 500, 350, inventory, name, update.filter, update.priority) {
             public void onItemsChanged(Item[] items, boolean allowed) {
                 changeAllowedStorage.runAndSend(items, allowed);
             }
@@ -246,16 +246,16 @@ public class PouchItemInventoryContainerForm<T extends PouchInventoryContainer> 
 
             @Override
             public void onBack() {
-
+                PouchItemInventoryContainerForm.this.switcher.makeCurrent(PouchItemInventoryContainerForm.this);
             }
-        }/*, (form, active) -> {
+        }, (form, active) -> {
             if (!active) {
                 this.switcher.removeComponent(form);
                 this.storageConfigForm = null;
                 // this.manager.subscribeStorage.unsubscribe(subscriptionID);
             }
 
-        }*/);
+        });
         this.switcher.makeCurrent(newStorageConfig);
         this.storageConfigForm = newStorageConfig;
         ContainerComponent.setPosFocus(this.storageConfigForm);

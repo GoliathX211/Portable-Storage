@@ -30,7 +30,11 @@ public class PouchInventory extends Inventory {
     @Override
     public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
         boolean out = false;
-
+        if (purpose.equals("itempickup")) {
+            if (!this.CategoryFilter.isItemAllowed(input.item)) {
+                return out;
+            }
+        }
         for(SlotPriority slotPriority:this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose)) {
             if (input.getAmount() <= 0) {
                 break;

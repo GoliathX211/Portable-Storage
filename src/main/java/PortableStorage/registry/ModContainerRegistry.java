@@ -12,7 +12,7 @@ public class ModContainerRegistry{
     public static int POUCH_INVENTORY_CONTAINER;
     public static void RegisterAll() {
         POUCH_INVENTORY_CONTAINER = registerContainer((client, uniqueSeed, packet) -> {
-            return new PouchItemInventoryContainerForm(client, new PouchInventoryContainer(client.getClient(), uniqueSeed, packet));
+            return new PouchItemInventoryContainerForm(client, new PouchInventoryContainer(client.getClient(), uniqueSeed, packet)).switcher;
         }, (client, uniqueSeed, packet, serverObject) -> {
             return new PouchInventoryContainer(client, uniqueSeed, packet);
         });
