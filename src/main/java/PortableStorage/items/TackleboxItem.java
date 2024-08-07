@@ -1,6 +1,7 @@
 package PortableStorage.items;
 
 import necesse.engine.localization.Localization;
+import necesse.engine.util.GameBlackboard;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.InventoryItem;
@@ -9,13 +10,16 @@ import necesse.inventory.item.miscItem.PouchItem;
 
 public class TackleboxItem extends BasicPouchItem {
     public TackleboxItem(int size, Rarity rarity) {
-        super(size, rarity);
-        drawStoredItems = true;
+        this(size, rarity, false);
+    }
+
+    public TackleboxItem(int size, Rarity rarity, boolean pickup) {
+        super(size, rarity, pickup);
     }
 
     @Override
-    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
-        ListGameTooltips tooltips = super.getTooltips(item, perspective);
+    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective, GameBlackboard blackboard) {
+        ListGameTooltips tooltips = super.getTooltips(item, perspective, blackboard);
         tooltips.add(Localization.translate("itemtooltip", "tackleboxExplanation"));
         return tooltips;
     }

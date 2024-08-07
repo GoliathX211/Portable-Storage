@@ -2,6 +2,7 @@ package PortableStorage.items;
 
 import necesse.engine.GameLog;
 import necesse.engine.localization.Localization;
+import necesse.engine.util.GameBlackboard;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.InventoryItem;
@@ -10,14 +11,18 @@ import necesse.inventory.item.miscItem.PouchItem;
 
 public class TacoboxItem extends BasicPouchItem{
     public TacoboxItem(int size, Rarity rarity) {
-        super(size, rarity);
+        this(size, rarity, false);
+    }
+
+    public TacoboxItem(int size, Rarity rarity, boolean pickup) {
+        super(size, rarity, pickup);
         this.canEatFoodFromPouch = true;
         this.canUseBuffPotionsFromPouch = true;
     }
 
     @Override
-    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
-        ListGameTooltips tooltips = getBaseTooltips(item, perspective);
+    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective, GameBlackboard blackboard) {
+        ListGameTooltips tooltips = getBaseTooltips(item, perspective, blackboard);
         tooltips.add(Localization.translate("itemtooltip", "rclickinvopentip"));
         tooltips.add(Localization.translate("itemtooltip", "storedfood", "items", this.getStoredItemAmounts(item)));
         tooltips.add(Localization.translate("itemtooltip", "tacoBoxExplanation"));

@@ -49,7 +49,7 @@ public class GNDDeepItemInventory extends GNDItem {
     }
 
     @Override
-    boolean isDefault() {
+    public boolean isDefault() {
         for(int i = 0; i < this.inventory.getSize(); ++i) {
             if (this.inventory.getAmount(i) > 0) {
                 return false;

@@ -15,8 +15,8 @@ TacoBox=Ящик Тако
 
 [itemtooltip]
 bagUsage=ПКМ, чтобы открыть рюкзак
-bagSize=Количество слотов: <размер>
-storedItems=Проданные предметы: <предметы>
+bagSize=Количество слотов: <size>
+storedItems=Хранимые предметы: <items>
 deepBagExplanation=В этом рюкзаке в <множитель>x больше предметов, чем в стаке!
 tackleboxExplanation=В этом рюкзаке может быть только наживка.
 tacoBoxExplanation=В этом рюкзаке могут быть только тако.
