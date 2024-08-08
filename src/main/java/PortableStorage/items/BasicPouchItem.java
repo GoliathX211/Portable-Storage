@@ -54,7 +54,6 @@ public class BasicPouchItem extends PouchItem {
 
     @Override
     public boolean inventoryAddItem(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem input, String purpose, boolean isValid, int stackLimit, boolean combineIsValid, InventoryAddConsumer addConsumer) {
-      GameLog.debug.println("Adding item " + input.toString() + ", purpose: " + purpose);
       if (isValidAddItem(input))
         if (isValidPurpose(this.insertPurposes, this.isInsertPurposesBlacklist, purpose)) {
           Inventory internalInventory = getInternalInventory(me);
@@ -64,6 +63,41 @@ public class BasicPouchItem extends PouchItem {
           } 
           return success;
         }  
+      return false;
+    }
+
+    @Override
+    public boolean onCombine(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem other, int maxStackSize, int amount, boolean combineIsNew, String purpose, InventoryAddConsumer addConsumer) {
+      boolean valid = false;
+      if (isValidPurpose(this.combinePurposes, this.isCombinePurposesBlacklist, purpose))
+        if (purpose.equals("lootall")) {
+          valid = isValidAddItem(other);
+        } else {
+          valid = isValidPouchItem(other);
+        }  
+      if (valid) {
+        Inventory internalInventory = getInternalInventory(me);
+        if (purpose.equals("restockfrom")) {
+          if (internalInventory.restockFrom(level, player, other, 0, internalInventory.getSize(), purpose, false, addConsumer)) {
+            saveInternalInventory(me, internalInventory);
+            return true;
+          } 
+          return false;
+        } 
+        int startAmount = Math.min(amount, other.getAmount());
+        InventoryItem copy = other.copy(startAmount);
+        if (!this.enable_pickup && purpose.equals("lootall"))
+          internalInventory.addItemOnlyCombine(level, player, copy, 0, internalInventory.getSize()-1, false, "pouchinsert", false, false, addConsumer);
+        else
+          internalInventory.addItem(level, player, copy, "pouchinsert", addConsumer);
+
+        if (copy.getAmount() != startAmount) {
+          int diff = startAmount - copy.getAmount();
+          other.setAmount(other.getAmount() - diff);
+          saveInternalInventory(me, internalInventory);
+          return true;
+        } 
+      } 
       return false;
     }
 
