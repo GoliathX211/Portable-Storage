@@ -55,7 +55,7 @@ public class BasicPouchItem extends PouchItem {
     @Override
     public boolean inventoryAddItem(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem input, String purpose, boolean isValid, int stackLimit, boolean combineIsValid, InventoryAddConsumer addConsumer) {
       if (isValidAddItem(input))
-        if (isValidPurpose(this.insertPurposes, this.isInsertPurposesBlacklist, purpose)) {
+        if (isValidPurpose(this.insertPurposes, this.isInsertPurposesBlacklist, purpose, isPickupDisabled(me))) {
           Inventory internalInventory = getInternalInventory(me);
           boolean success = (!this.enable_pickup && purpose.equals("itempickup")) ? internalInventory.addItemOnlyCombine(level, player, input, 0, internalInventory.getSize()-1, false, purpose, false, false, addConsumer) : internalInventory.addItem(level, player, input, purpose, addConsumer);
           if (success) {
@@ -69,7 +69,7 @@ public class BasicPouchItem extends PouchItem {
     @Override
     public boolean onCombine(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem other, int maxStackSize, int amount, boolean combineIsNew, String purpose, InventoryAddConsumer addConsumer) {
       boolean valid = false;
-      if (isValidPurpose(this.combinePurposes, this.isCombinePurposesBlacklist, purpose))
+      if (isValidPurpose(this.combinePurposes, this.isCombinePurposesBlacklist, purpose, isPickupDisabled(me)))
         if (purpose.equals("lootall")) {
           valid = isValidAddItem(other);
         } else {
