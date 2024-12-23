@@ -19,12 +19,13 @@ public class DeepPouchInventory extends Inventory {
         this.multiplicity = multiplicity;
     }
     @Override
-    public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, String purpose, boolean ignoreValid, boolean ignoreStackLimit) {
+    public boolean addItem(Level level, PlayerMob player, InventoryItem input, int startSlot, int endSlot, boolean combineIsNew, String purpose, boolean ignoreValid, boolean ignoreStackLimit, InventoryAddConsumer addConsumer) {
         boolean out = false;
-        Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
+        /*Iterator var10 = this.getPriorityAddList(level, player, input, startSlot, endSlot, purpose).iterator();
 
-        while(var10.hasNext()) {
-            SlotPriority slotPriority = (SlotPriority)var10.next();
+        while(var10.hasNext()) {*/
+        for (SlotPriority slotPriority : getPriorityAddList(level, player, input, startSlot, endSlot, purpose)) {
+            //SlotPriority slotPriority = (SlotPriority)var10.next();
             if (input.getAmount() <= 0) {
                 break;
             }
@@ -32,7 +33,7 @@ public class DeepPouchInventory extends Inventory {
             boolean isValid = ignoreValid || this.isItemValid(slotPriority.slot, input);
             int stackLimit = ignoreStackLimit ? input.itemStackSize() : this.getItemStackLimit(slotPriority.slot, input);
             InventoryItem invItem = this.getItem(slotPriority.slot);
-            boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, invItem, input, stackLimit, input.getAmount(), purpose);
+            boolean invAddItemResult = isValid && invItem.item.canCombineItem(level, player, invItem, input, purpose) && invItem.item.onCombine(level, player, this, slotPriority.slot, invItem, input, stackLimit, input.getAmount(), combineIsNew, purpose, addConsumer);
             if (invAddItemResult) {
                 out = true;
                 this.updateSlot(slotPriority.slot);
@@ -47,6 +48,8 @@ public class DeepPouchInventory extends Inventory {
                     InventoryItem insert = input.copy(amount);
                     this.setItem(i, insert);
                     input.setAmount(input.getAmount() - amount);
+                    if (addConsumer != null)
+                        addConsumer.add(this, i, amount);
                     out = true;
                 }
             }
@@ -97,8 +100,9 @@ public class DeepPouchInventory extends Inventory {
         };
         return inventory;
     }
+
     @Override
-    public ItemCombineResult combineItem(Level level, PlayerMob player, int staySlot, InventoryItem combineItem, int amount, String purpose) {
+    public ItemCombineResult combineItem(Level level, PlayerMob player, int staySlot, InventoryItem combineItem, int amount, boolean combineIsNew, String purpose, InventoryAddConsumer addConsumer) {
         if (!this.isSlotClear(staySlot) && combineItem != null) {
             InventoryItem invItem = this.getItem(staySlot);
 
@@ -107,7 +111,9 @@ public class DeepPouchInventory extends Inventory {
             amount = Math.min(combineItem.getAmount(), amount);
             if (amount <= 0) return ItemCombineResult.failure();
 
-            boolean result = invItem.item.onCombine(level, player, invItem, combineItem, invItem.item.getStackSize() * multiplicity, amount, purpose);
+            boolean result = invItem.item.onCombine(level, player, this, staySlot, invItem, combineItem, invItem.item.getStackSize() * multiplicity, amount, combineIsNew, purpose, addConsumer);
+            if (result)
+                updateSlot(staySlot);
             return result ? ItemCombineResult.success() : ItemCombineResult.failure();
         }
         return ItemCombineResult.failure();

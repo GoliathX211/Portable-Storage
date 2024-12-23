@@ -9,7 +9,7 @@ def modInfo = [
         modID          : "goliath.portablestorage",
         modName        : "Portable Storage",
         modVersion     : "1.13",
-        gameVersion    : "0.21.23",
+        gameVersion    : "0.26.0",
         modDescription : "Implements unique storage bags so you can store all your items.",
         author         : "GoliathX211; Deadly990",
         clientside     : false,

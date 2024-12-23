@@ -1,22 +1,31 @@
 package PortableStorage.items;
 
+import necesse.engine.GameLog;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.gameNetworkData.GNDItem;
 import necesse.engine.network.gameNetworkData.GNDItemInventory;
+import necesse.engine.util.GameBlackboard;
 import necesse.entity.mobs.PlayerMob;
 import necesse.gfx.gameTooltips.ListGameTooltips;
 import necesse.inventory.Inventory;
 import necesse.inventory.InventoryItem;
 import necesse.inventory.item.Item;
 import necesse.inventory.item.miscItem.PouchItem;
+import necesse.inventory.InventoryAddConsumer;
+import necesse.level.maps.Level;
 
 public class BasicPouchItem extends PouchItem {
     protected final int size;
+    protected final boolean enable_pickup;
     public BasicPouchItem(int size, Rarity rarity){
+        this(size, rarity, false);
+    }
+
+    public BasicPouchItem(int size, Rarity rarity, boolean pickup){
         this.rarity = rarity;
         this.size = size;
+        this.enable_pickup = pickup;
         drawStoredItems = false;
-
     }
     /*
     ITEM_INVENTORY_CONTAINER = registerContainer((client, uniqueSeed, packet) -> {
@@ -43,6 +52,54 @@ public class BasicPouchItem extends PouchItem {
     }
     */
 
+    @Override
+    public boolean inventoryAddItem(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem input, String purpose, boolean isValid, int stackLimit, boolean combineIsValid, InventoryAddConsumer addConsumer) {
+      if (isValidAddItem(input))
+        if (isValidPurpose(this.insertPurposes, this.isInsertPurposesBlacklist, purpose, isPickupDisabled(me))) {
+          Inventory internalInventory = getInternalInventory(me);
+          boolean success = (!this.enable_pickup && purpose.equals("itempickup")) ? internalInventory.addItemOnlyCombine(level, player, input, 0, internalInventory.getSize()-1, false, purpose, false, false, addConsumer) : internalInventory.addItem(level, player, input, purpose, addConsumer);
+          if (success) {
+            saveInternalInventory(me, internalInventory);
+          } 
+          return success;
+        }  
+      return false;
+    }
+
+    @Override
+    public boolean onCombine(Level level, PlayerMob player, Inventory myInventory, int mySlot, InventoryItem me, InventoryItem other, int maxStackSize, int amount, boolean combineIsNew, String purpose, InventoryAddConsumer addConsumer) {
+      boolean valid = false;
+      if (isValidPurpose(this.combinePurposes, this.isCombinePurposesBlacklist, purpose, isPickupDisabled(me)))
+        if (purpose.equals("lootall")) {
+          valid = isValidAddItem(other);
+        } else {
+          valid = isValidPouchItem(other);
+        }  
+      if (valid) {
+        Inventory internalInventory = getInternalInventory(me);
+        if (purpose.equals("restockfrom")) {
+          if (internalInventory.restockFrom(level, player, other, 0, internalInventory.getSize(), purpose, false, addConsumer)) {
+            saveInternalInventory(me, internalInventory);
+            return true;
+          } 
+          return false;
+        } 
+        int startAmount = Math.min(amount, other.getAmount());
+        InventoryItem copy = other.copy(startAmount);
+        if (!this.enable_pickup && purpose.equals("lootall"))
+          internalInventory.addItemOnlyCombine(level, player, copy, 0, internalInventory.getSize()-1, false, "pouchinsert", false, false, addConsumer);
+        else
+          internalInventory.addItem(level, player, copy, "pouchinsert", addConsumer);
+
+        if (copy.getAmount() != startAmount) {
+          int diff = startAmount - copy.getAmount();
+          other.setAmount(other.getAmount() - diff);
+          saveInternalInventory(me, internalInventory);
+          return true;
+        } 
+      } 
+      return false;
+    }
 
     @Override
     public Inventory getInternalInventory(InventoryItem item) {
@@ -68,8 +125,8 @@ public class BasicPouchItem extends PouchItem {
     }
 
     @Override
-    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective) {
-        ListGameTooltips tooltips = super.getTooltips(item, perspective);
+    public ListGameTooltips getTooltips(InventoryItem item, PlayerMob perspective, GameBlackboard blackboard) {
+        ListGameTooltips tooltips = super.getTooltips(item, perspective, blackboard);
         tooltips.add(Localization.translate("itemtooltip", "rclickinvopentip"));
         tooltips.add(Localization.translate("itemtooltip", "bagSize", "size", this.size));
         tooltips.add(Localization.translate("itemtooltip", "storedItems", "items", this.getStoredItemAmounts(item)));
